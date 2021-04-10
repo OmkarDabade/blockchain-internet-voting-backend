@@ -11,13 +11,13 @@ Please read the [step-by-step implementation tutorial](https://www.ibm.com/devel
 Clone the project,
 
 ```sh
-$ git clone https://github.com/satwikkansal/python_blockchain_app.git
+$ git clone https://github.com/OmkarDabade/Blockchain-I-voting.git
 ```
 
 Install the dependencies,
 
 ```sh
-$ cd python_blockchain_app
+$ cd Blockchain-I-voting
 $ pip install -r requirements.txt
 ```
 
