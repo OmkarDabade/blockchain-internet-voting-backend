@@ -17,12 +17,12 @@ class Blockchain:
 
     def createGenesisBlock(self, data=None):
         if data != None:
-            VoteBlock(0, data['voteTo'], data['voteFrom'],
-                      data['timestamp'], 'Previous Hash')
+            self.blockchain.append(VoteBlock(0, data['voteTo'], data['voteFrom'],
+                      data['timestamp'], 'Previous Hash'))
             # self.blockchain.append(VoteBlock(0, data, '0'))
         else:
-            VoteBlock(0, 'voteToCandidate', 'voteFromVoter',
-                      'timestamp', 'Previous Hash')
+            self.blockchain.append(VoteBlock(0, 'voteToCandidate', 'voteFromVoter',
+                      'timestamp', 'Previous Hash'))
             # self.blockchain.append(VoteBlock(0, 'Genesis Block', '0'))
         self.previousIndex = 0
         self.previousHash = self.blockchain[-1].blockHash

@@ -1,1 +1,1 @@
-difficulty = 2
+difficulty = 4
