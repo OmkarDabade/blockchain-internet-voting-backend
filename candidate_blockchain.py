@@ -8,7 +8,14 @@ class CandidateBlockchain:
 
     def addCandidateData(self, data):
         self.blockchain.append(
-            CandidateBlock(self.previousIndex+1, data['candidateName'], data['candidateId'], data['candidateAgenda'], self.previousHash))
+            CandidateBlock(
+                self.previousIndex + 1,
+                data["candidateName"],
+                data["candidateId"],
+                data["candidateAgenda"],
+                self.previousHash,
+            )
+        )
         self.previousIndex += 1
         self.previousHash = self.blockchain[-1].blockHash
 

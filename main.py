@@ -1,4 +1,7 @@
 from vote_blockchain import Blockchain
+from flask import Flask, jsonify
+
+app = Flask(__name__)
 
 blockchain = Blockchain()
 blockchain.createGenesisBlock()
@@ -23,3 +26,21 @@ for item in blockchain.blockchain:
 
 
 # print(blockchain.blockchain[-1])
+
+
+@app.route("/chain")
+def getChain():
+    chain = []
+    for item in blockchain.blockchain:
+        chain.append(item.toJson())
+
+    return jsonify({"votedChain": chain})
+
+
+@app.route("/")
+def index():
+    return "Hello World this is I-Vote Server"
+
+
+if __name__ == "__main__":
+    app.run(debug=True)

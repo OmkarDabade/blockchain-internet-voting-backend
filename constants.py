@@ -1,1 +1,2 @@
-difficulty = 4
+difficultyVoteBlockchain = 4
+difficultyCandidateBlockchain = difficultyVoteBlockchain
