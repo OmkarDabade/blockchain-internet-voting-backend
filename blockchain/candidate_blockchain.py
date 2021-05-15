@@ -1,4 +1,4 @@
-from candidate_block import CandidateBlock
+from block.candidate_block import CandidateBlock
 
 
 class CandidateBlockchain:

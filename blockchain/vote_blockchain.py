@@ -1,7 +1,7 @@
-from vote_block import VoteBlock
+from block.vote_block import VoteBlock
 
 
-class Blockchain:
+class VoteBlockchain:
     previousIndex = 0
     previousHash = None
     blockchain = []
