@@ -4,9 +4,9 @@ from flask import jsonify
 
 
 @iVoteApp.route("/chain")
-def getChain():
+def chain():
     chain = []
-    for item in voteBlockchain.blockchain:
+    for item in voteBlockchain.chain:
         chain.append(item.toJson())
 
     return jsonify({"votedChain": chain})

@@ -16,6 +16,9 @@ if __name__ == "__main__":
         data["voteFrom"] = f"Data Index %s" % (i + 1)
         voteBlockchain.addBlock(data)
 
+    for item in voteBlockchain.chain:
+        print(item)
+
     iVoteApp.run(debug=True)
 
 

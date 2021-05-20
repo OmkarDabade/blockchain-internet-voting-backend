@@ -4,10 +4,10 @@ from block.candidate_block import CandidateBlock
 class CandidateBlockchain:
     previousIndex = 0
     previousHash = None
-    blockchain = []
+    chain = []
 
     def addCandidateData(self, data):
-        self.blockchain.append(
+        self.chain.append(
             CandidateBlock(
                 self.previousIndex + 1,
                 data["candidateName"],
@@ -17,7 +17,7 @@ class CandidateBlockchain:
             )
         )
         self.previousIndex += 1
-        self.previousHash = self.blockchain[-1].blockHash
+        self.previousHash = self.chain[-1].blockHash
 
     # def mine(self):
     #     pass
