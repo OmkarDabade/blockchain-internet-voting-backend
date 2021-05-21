@@ -1,9 +1,14 @@
 from ivote import iVoteApp
-from flask import jsonify, request
+from flask import request
 
 
-@iVoteApp.route("/login")
+@iVoteApp.route("/login", methods=["GET", "POST"])
 def login():
-    # query = request.get_json()
-    # print(query)
-    return "Done"
+    try:
+        loginId = request.args.get("loginId")
+        print(loginId)
+        password = request.args.get("password")
+        print(password)
+
+    finally:
+        return "USER NOT FOUND"
