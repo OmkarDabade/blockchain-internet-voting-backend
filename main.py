@@ -9,8 +9,6 @@ data["timestamp"] = "now"
 
 if __name__ == "__main__":
 
-    voteBlockchain.createGenesisBlock()
-
     # Test Data
     for i in range(5):
         data["voteFrom"] = f"Data Index %s" % (i + 1)

@@ -6,18 +6,22 @@ class CandidateBlock:
     index = 0
     candidateName = None
     candidateId = None
-    candidateAgenda = None
+    state = None
+    district = None
+    ward = None
     blockHash = None
     nonce = 0
     previousBlockHash = None
 
     def __init__(
-        self, index, candidateName, candidateId, candidateAgenda, previousHash
+        self, index, candidateName, candidateId, state, district, ward, previousHash
     ):
         self.index = index
         self.candidateName = candidateName
         self.candidateId = candidateId
-        self.candidateAgenda = candidateAgenda
+        self.state = state
+        self.district = district
+        self.ward = ward
         self.previousBlockHash = previousHash
         self.computeProofOfWork()
 
@@ -27,7 +31,9 @@ class CandidateBlock:
             str(self.index)
             + str(self.candidateName)
             + str(self.candidateId)
-            + str(self.candidateAgenda)
+            + str(self.state)
+            + str(self.district)
+            + str(self.ward)
             + str(self.nonce)
             + str(self.previousBlockHash)
         )
@@ -43,11 +49,13 @@ class CandidateBlock:
         # return blockHash
 
     def __str__(self):
-        return "\nBlock#: %s\nCandidate Id: %s\nCandidate Name: %s\nCandidate Agenda: %s\nNonce: %s\nHash: %s\nPrevious Hash: %s" % (
+        return "\nBlock#: %s\nCandidate Id: %s\nCandidate Name: %s\nState: %s\nDistrict: %s\nWard#: %s\nNonce: %s\nHash: %s\nPrevious Hash: %s" % (
             self.index,
             self.candidateId,
             self.candidateName,
-            self.candidateAgenda,
+            self.state,
+            self.district,
+            self.ward,
             self.nonce,
             self.blockHash,
             self.previousBlockHash,
@@ -58,7 +66,9 @@ class CandidateBlock:
             "Block#": self.index,
             "Candidate Id": self.candidateId,
             "Candidate Name": self.candidateName,
-            "Candidate Agenda": self.candidateAgenda,
+            "State": self.state,
+            "District": self.district,
+            "Ward#": self.ward,
             "Nonce": self.nonce,
             "Hash": self.blockHash,
             "Previous Hash": self.previousBlockHash,
