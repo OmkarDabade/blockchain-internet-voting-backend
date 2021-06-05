@@ -1,20 +1,20 @@
-from hashlib import sha256
 from constants import *
+from hashlib import sha256
+
 
 
 class CandidateBlock:
-    index = 0
-    candidateName = None
-    candidateId = None
-    state = None
-    district = None
-    ward = None
-    blockHash = None
-    nonce = 0
-    previousBlockHash = None
-
     def __init__(
-        self, index, candidateName, candidateId, state, district, ward, previousHash
+        self,
+        index,
+        candidateId,
+        candidateName,
+        state,
+        district,
+        ward,
+        previousBlockHash,
+        nonce=0,
+        blockHash=None,
     ):
         self.index = index
         self.candidateName = candidateName
@@ -22,8 +22,12 @@ class CandidateBlock:
         self.state = state
         self.district = district
         self.ward = ward
-        self.previousBlockHash = previousHash
-        self.computeProofOfWork()
+        self.previousBlockHash = previousBlockHash
+        if blockHash is not None:
+            self.blockHash = blockHash
+            self.nonce = nonce
+        else:
+            self.computeProofOfWork()
 
     def computeHash(self):
         # blockString = json.dumps(self.__dict__, sort_keys=True)
@@ -42,6 +46,7 @@ class CandidateBlock:
     def computeProofOfWork(self):
         self.nonce = 0
         computedHash = self.computeHash()
+
         while not computedHash.startswith("0" * difficultyCandidateBlockchain):
             self.nonce += 1
             computedHash = self.computeHash()
@@ -49,7 +54,7 @@ class CandidateBlock:
         # return blockHash
 
     def __str__(self):
-        return "\nBlock#: %s\nCandidate Id: %s\nCandidate Name: %s\nState: %s\nDistrict: %s\nWard#: %s\nNonce: %s\nHash: %s\nPrevious Hash: %s" % (
+        return "\nBlock#: %s\nCandidate Id: %s\nCandidate Name: %s\nState: %s\nDistrict: %s\nWard#: %s\nNonce: %s\nBlock Hash: %s\nPrevious Hash: %s" % (
             self.index,
             self.candidateId,
             self.candidateName,
@@ -70,6 +75,6 @@ class CandidateBlock:
             "District": self.district,
             "Ward#": self.ward,
             "Nonce": self.nonce,
-            "Hash": self.blockHash,
+            "Block Hash": self.blockHash,
             "Previous Hash": self.previousBlockHash,
         }

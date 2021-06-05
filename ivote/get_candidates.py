@@ -5,10 +5,11 @@ from blockchain import candidateBlockchain
 
 @iVoteApp.route("/get_candidates", methods=["GET"])
 def get_candidates():
+    print("/get_candidates Called")
     try:
         if request.is_json:
             jsonData = request.get_json()
-            print(jsonData)
+            print("JSON DATA RECIEVED:", jsonData)
             chain = []
 
             if "state" in jsonData and "district" in jsonData and "ward" in jsonData:
@@ -23,7 +24,14 @@ def get_candidates():
                         print("Match found")
                         chain.append(item.toJson())
 
-                return jsonify({"result": True, "data": chain})
+                return jsonify(
+                    {
+                        "result": True,
+                        "data": chain,
+                        "api": "/get_candidates",
+                        "url": request.url,
+                    }
+                )
 
             elif "state" in jsonData and "district" in jsonData:
                 for item in candidateBlockchain.chain:
@@ -33,13 +41,41 @@ def get_candidates():
                     ):
                         chain.append(item.toJson())
 
-                return jsonify({"result": True, "data": chain})
+                return jsonify(
+                    {
+                        "result": True,
+                        "data": chain,
+                        "api": "/get_candidates",
+                        "url": request.url,
+                    }
+                )
 
             else:
-                return jsonify({"result": False, "error": "Incomplete Data"})
+                return jsonify(
+                    {
+                        "result": False,
+                        "error": "Incomplete Data",
+                        "api": "/get_candidates",
+                        "url": request.url,
+                    }
+                )
 
         else:
-            return jsonify({"result": False, "error": "Invalid JSON Format"})
+            return jsonify(
+                {
+                    "result": False,
+                    "error": "Invalid JSON Format",
+                    "api": "/get_candidates",
+                    "url": request.url,
+                }
+            )
 
     except:
-        return jsonify({"result": False, "error": "Some error occured"})
+        return jsonify(
+            {
+                "result": False,
+                "error": "Some error occured",
+                "api": "/get_candidates",
+                "url": request.url,
+            }
+        )

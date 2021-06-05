@@ -1,23 +1,21 @@
-from hashlib import sha256
 from constants import *
+from hashlib import sha256
 
 
 class VoteBlock:
-    index = 0
-    voteFrom = None
-    voteTo = None
-    timestamp = None
-    blockHash = None
-    nonce = 0
-    previousBlockHash = None
-
-    def __init__(self, index, voteTo, voteFrom, timestamp, previousHash):
+    def __init__(
+        self, index, voteTo, voteFrom, timestamp, previousHash, blockHash=None, nonce=0
+    ):
         self.index = index
         self.voteTo = voteTo
         self.voteFrom = voteFrom
         self.timestamp = timestamp
         self.previousBlockHash = previousHash
-        self.computeProofOfWork()
+        if blockHash is not None:
+            self.blockHash = blockHash
+            self.nonce = nonce
+        else:
+            self.computeProofOfWork()
 
     def computeHash(self):
         # blockString = json.dumps(self.__dict__, sort_keys=True)
@@ -41,7 +39,7 @@ class VoteBlock:
         # return blockHash
 
     def __str__(self):
-        return "\nBlock#: %s\nVote To: %s\nVote From: %s\nTime: %s\nNonce: %s\nHash: %s\nPrevious Hash: %s" % (
+        return "\nBlock#: %s\nVote To: %s\nVote From: %s\nTime: %s\nNonce: %s\nBlock Hash: %s\nPrevious Hash: %s" % (
             self.index,
             self.voteTo,
             self.voteFrom,
@@ -58,6 +56,6 @@ class VoteBlock:
             "Vote From": self.voteFrom,
             "Time": self.timestamp,
             "Nonce": self.nonce,
-            "Hash": self.blockHash,
+            "Block Hash": self.blockHash,
             "Previous Hash": self.previousBlockHash,
         }

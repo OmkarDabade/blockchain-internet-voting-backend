@@ -5,10 +5,11 @@ from blockchain import voteBlockchain
 
 @iVoteApp.route("/search", methods=["GET"])
 def search():
+    print("/search Called")
     try:
         if request.is_json:
             jsonData = request.get_json()
-            print(jsonData)
+            print("JSON DATA RECIEVED:", jsonData)
 
             if "blockHash" in jsonData:
                 for item in voteBlockchain.chain:
@@ -29,10 +30,31 @@ def search():
                         return item.toJson()
 
             else:
-                return jsonify({"result": False, "error": "Incomplete Data"})
+                return jsonify(
+                    {
+                        "result": False,
+                        "error": "Incomplete Data",
+                        "api": "/search",
+                        "url": request.url,
+                    }
+                )
 
         else:
-            return jsonify({"result": False, "error": "Invalid JSON Format"})
+            return jsonify(
+                {
+                    "result": False,
+                    "error": "Invalid JSON Format",
+                    "api": "/search",
+                    "url": request.url,
+                }
+            )
 
     except:
-        return jsonify({"result": False, "error": "Some error occured"})
+        return jsonify(
+            {
+                "result": False,
+                "error": "Some error occured",
+                "api": "/search",
+                "url": request.url,
+            }
+        )
