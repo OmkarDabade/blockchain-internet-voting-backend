@@ -37,13 +37,16 @@ def add_block():
                 res = voteBlockchain.acceptNewAnnouncedBlock(newBlock)
                 # chain()
                 if res:
-                    return jsonify(
-                        {
-                            "result": True,
-                            "data": get_chain(),
-                            "api": "/add_block",
-                            "url": request.url,
-                        }
+                    return (
+                        jsonify(
+                            {
+                                "result": True,
+                                "data": get_chain(),
+                                "api": "/add_block",
+                                "url": request.url,
+                            }
+                        ),
+                        200,
                     )
                 else:
                     return jsonify(

@@ -2,7 +2,6 @@ from constants import *
 from hashlib import sha256
 
 
-
 class CandidateBlock:
     def __init__(
         self,
