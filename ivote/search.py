@@ -1,33 +1,58 @@
 from ivote import iVoteApp
 from flask import request, jsonify
-from blockchain import voteBlockchain
+from blockchain import blockchain
 
 
 @iVoteApp.route("/search", methods=["GET"])
 def search():
     print("/search Called")
+    print("DATA RECIEVED:", request.data)
+
     try:
         if request.is_json:
             jsonData = request.get_json()
-            print("JSON DATA RECIEVED:", jsonData)
 
             if "blockHash" in jsonData:
-                for item in voteBlockchain.chain:
-                    print(item.blockHash)
-                    if item.blockHash == jsonData["blockHash"]:
-                        return item.toJson()
+                for vote in blockchain.chain:
+                    print(vote.blockHash)
+                    if vote.blockHash == jsonData["blockHash"]:
+                        return vote.toJson()
+                return jsonify(
+                    {
+                        "result": False,
+                        "error": "Not Found",
+                        "api": "/search",
+                        "url": request.url,
+                    }
+                )
 
             elif "blockNo" in jsonData:
-                for item in voteBlockchain.chain:
-                    print(item.index)
-                    if item.index == jsonData["blockNo"]:
-                        return item.toJson()
+                for vote in blockchain.chain:
+                    print(vote.index)
+                    if vote.index == jsonData["blockNo"]:
+                        return vote.toJson()
+                return jsonify(
+                    {
+                        "result": False,
+                        "error": "Not Found",
+                        "api": "/search",
+                        "url": request.url,
+                    }
+                )
 
-            elif "voteFrom" in jsonData:
-                for item in voteBlockchain.chain:
-                    print(item.voteFrom)
-                    if item.voteFrom == jsonData["voteFrom"]:
-                        return item.toJson()
+            elif "fromVoter" in jsonData:
+                for vote in blockchain.chain:
+                    print(vote.fromVoter)
+                    if vote.fromVoter == jsonData["fromVoter"]:
+                        return vote.toJson()
+                return jsonify(
+                    {
+                        "result": False,
+                        "error": "Not Found",
+                        "api": "/search",
+                        "url": request.url,
+                    }
+                )
 
             else:
                 return jsonify(

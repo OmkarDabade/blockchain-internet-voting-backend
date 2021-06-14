@@ -1,28 +1,31 @@
 from ivote import iVoteApp
 from flask import jsonify, request
-from blockchain import voteBlockchain
+from blockchain import blockchain
 
 
-@iVoteApp.route("/cast_vote", methods=["POST"])
-# @auth.login_required
-def cast_vote():
-    print("/cast_vote Called")
+@iVoteApp.route("/castVote", methods=["POST"])
+def castVote():
+    print("/castVote Called")
+    print("DATA RECIEVED:", request.data)
+
     try:
         if request.is_json:
             jsonData = request.get_json()
-            print("JSON DATA RECIEVED:", jsonData)
 
-            if "candidateId" in jsonData and "voterId" in jsonData:
-                data = {
-                    "voteTo": jsonData["candidateId"],
-                    "timestamp": "JustNOW",
-                    "voteFrom": jsonData["voterId"],
-                }
-                voteBlockchain.addBlock(data)
+            if (
+                "candidateId" in jsonData
+                and "candidateName" in jsonData
+                and "fromVoter" in jsonData
+            ):
+                blockchain.addBlock(
+                    jsonData["candidateId"],
+                    jsonData["candidateName"],
+                    jsonData["fromVoter"],
+                )
                 return jsonify(
                     {
                         "result": True,
-                        "data": voteBlockchain.chain[-1].toJson(),
+                        "data": blockchain.chain[-1].toJson(),
                         "api": "/cast_vote",
                         "url": request.url,
                     }

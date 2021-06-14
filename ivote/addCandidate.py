@@ -1,15 +1,16 @@
 from ivote import iVoteApp
 from flask import request, jsonify
-from blockchain import candidateBlockchain
+from blockchain import candidateList, candidates
 
 
-@iVoteApp.route("/add_candidate", methods=["POST"])
-def add_candidate():
-    print("/add_candidate Called")
+@iVoteApp.route("/addCandidate", methods=["POST"])
+def addCandidate():
+    print("/addCandidate Called")
+    print("DATA RECIEVED:", request.data)
+
     try:
         if request.is_json:
             jsonData = request.get_json()
-            print("JSON DATA RECIEVED:", jsonData)
 
             if (
                 "candidateId" in jsonData
@@ -18,20 +19,18 @@ def add_candidate():
                 and "district" in jsonData
                 and "ward" in jsonData
             ):
-                data = {
-                    "candidateName": jsonData["candidateName"],
-                    "candidateId": jsonData["candidateId"],
-                    "state": jsonData["state"],
-                    "district": jsonData["district"],
-                    "ward": jsonData["ward"],
-                }
-
-                candidateBlockchain.addCandidateData(data)
+                candidates.addCandidate(
+                    jsonData["candidateId"],
+                    jsonData["candidateName"],
+                    jsonData["state"],
+                    jsonData["district"],
+                    jsonData["ward"],
+                )
 
                 return jsonify(
                     {
                         "result": True,
-                        "data": candidateBlockchain.chain[-1].toJson(),
+                        "data": candidateList[-1].toJson(),
                         "api": "/add_candidate",
                         "url": request.url,
                     }

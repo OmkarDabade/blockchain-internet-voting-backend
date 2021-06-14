@@ -1,5 +1,7 @@
-from .candidate_blockchain import CandidateBlockchain
-from .vote_blockchain import VoteBlockchain
+from .candidates import Candidates
+from .blockchain import Blockchain
 
-voteBlockchain = VoteBlockchain()
-candidateBlockchain = CandidateBlockchain()
+blockchain = Blockchain()
+candidates = Candidates()
+
+candidateList = candidates.candidatesList

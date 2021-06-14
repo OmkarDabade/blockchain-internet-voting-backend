@@ -1,23 +1,22 @@
-# from blockchain import peers
 from ivote import iVoteApp, get_chain
 from flask import request, jsonify
 import requests
 from constants import peers
 
-# import json
 
 # endpoint to add new peers to the network.
-@iVoteApp.route("/register_from_new_node", methods=["POST"])
-def register_from_new_node():
-    print("/register_from_new_node Called")
+@iVoteApp.route("/registerFromNewNode", methods=["POST"])
+def registerFromNewNode():
+    print("/registerFromNewNode Called")
+    print("DATA RECIEVED:", request.data)
+
     try:
         if request.is_json:
             jsonData = request.get_json()
-            print("JSON DATA RECIEVED:", jsonData)
 
-            node_address = jsonData["node_address"]
+            nodeAddress = jsonData["nodeAddress"]
 
-            if not node_address:
+            if not nodeAddress:
                 return jsonify(
                     {
                         "result": False,
@@ -28,7 +27,7 @@ def register_from_new_node():
                 )
 
             # Add the node to the peer list
-            peers.add(node_address)
+            peers.add(nodeAddress)
 
             data = get_chain()
             print(data)
@@ -36,7 +35,7 @@ def register_from_new_node():
 
             # Make a request to register with remote node and send information
             res = requests.post(
-                url=node_address + "/create_chain_from_dump",
+                url=nodeAddress + "/createChainFromDump",
                 json=data,
                 headers=header,
             )

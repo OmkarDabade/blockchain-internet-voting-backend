@@ -1,35 +1,34 @@
-# from ivote.chain import chain
-from blockchain import voteBlockchain
+from blockchain import blockchain
 from flask import request, jsonify
-from block.vote_block import VoteBlock
+from block.vote import Vote
 from ivote import iVoteApp, get_chain
 
 
-@iVoteApp.route("/create_chain_from_dump", methods=["POST"])
-def create_chain_from_dump():
-    print("/create_chain_from_dump Called")
+@iVoteApp.route("/createChainFromDump", methods=["POST"])
+def createChainFromDump():
+    print("/createChainFromDump Called")
+    print("DATA RECIEVED:", request.data)
+
     try:
-        print(request.is_json)
         if request.is_json:
             jsonData = request.get_json()
-            print("JSON DATA RECIEVED:", jsonData)
             chainDump = jsonData["Chain"]
 
             for block_data in chainDump:
 
-                block = VoteBlock(
-                    index=block_data["Block#"],
-                    voteTo=block_data["Vote To"],
-                    voteFrom=block_data["Vote From"],
-                    timestamp=block_data["Time"],
-                    previousHash=block_data["Previous Hash"],
-                    blockHash=block_data["Block Hash"],
-                    nonce=block_data["Nonce"],
+                block = Vote(
+                    index=block_data["block#"],
+                    candidateId=block_data["candidateId"],
+                    candidateName=block_data["candidateName"],
+                    fromVoter=block_data["fromVoter"],
+                    timestamp=block_data["time"],
+                    previousHash=block_data["previousHash"],
+                    blockHash=block_data["blockHash"],
+                    nonce=block_data["nonce"],
                 )
                 print("Block#:", block.index)
-                print(block)
 
-                added = voteBlockchain.acceptNewAnnouncedBlock(block)
+                added = blockchain.acceptNewAnnouncedBlock(block)
                 if not added:
                     # raise Exception("The chain dump is tampered!!")
                     print("Block not added in chain")

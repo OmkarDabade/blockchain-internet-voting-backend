@@ -1,41 +1,41 @@
-from block.vote_block import VoteBlock
+from block.vote import Vote
 from ivote import iVoteApp, get_chain
 from flask import request, jsonify
-from blockchain import voteBlockchain
-
-# from .chain import chain
+from blockchain import blockchain
 
 
-@iVoteApp.route("/add_block", methods=["POST"])
-def add_block():
-    print("/add_block Called")
+@iVoteApp.route("/addBlock", methods=["POST"])
+def addBlock():
+    print("/addBlock Called")
+    print("DATA RECIEVED:", request.data)
+    
     try:
         if request.is_json:
             jsonData = request.get_json()
-            print("JSON DATA RECIEVED:", jsonData)
 
             if (
-                "Block#" in jsonData
-                and "Vote To" in jsonData
-                and "Vote From" in jsonData
-                and "Time" in jsonData
-                and "Nonce" in jsonData
-                and "Block Hash" in jsonData
-                and "Previous Hash" in jsonData
+                "block#" in jsonData
+                and "candidateId" in jsonData
+                and "candidateName" in jsonData
+                and "fromVoter" in jsonData
+                and "time" in jsonData
+                and "nonce" in jsonData
+                and "blockHash" in jsonData
+                and "previousHash" in jsonData
             ):
-                newBlock = VoteBlock(
-                    jsonData["Block#"],
-                    jsonData["Vote To"],
-                    jsonData["Vote From"],
-                    jsonData["Time"],
-                    jsonData["Previous Hash"],
-                    blockHash=jsonData["Block Hash"],
-                    nonce=jsonData["Nonce"],
+                newBlock = Vote(
+                    jsonData["block#"],
+                    jsonData["candidateId"],
+                    jsonData["candidateName"],
+                    jsonData["fromVoter"],
+                    jsonData["time"],
+                    jsonData["previousHash"],
+                    blockHash=jsonData["blockHash"],
+                    nonce=jsonData["nonce"],
                 )
 
-                # voteBlockchain.addBlock(newBlock)
-                res = voteBlockchain.acceptNewAnnouncedBlock(newBlock)
-                # chain()
+                res = blockchain.acceptNewAnnouncedBlock(newBlock)
+
                 if res:
                     return (
                         jsonify(

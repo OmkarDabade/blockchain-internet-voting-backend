@@ -18,3 +18,41 @@ r = requests.post(url=url, json=jsonData, headers=headers)
 
 print("Response is:", r.json())
 print(type(r.json()["result"]))
+
+addCandidate = {
+    "candidateId": 1234,
+    "candidateName": "Candidate Name 1",
+    "state": "KA",
+    "district": "BGM",
+    "ward": 4,
+}
+
+castVote = {
+    "candidateId": 789,
+    "candidateName": "Casted Candidate",
+    "fromVoter": "kjashvuishgvuiwlavysqlgvidbdbrsagyv",
+}
+
+getCandidate = {"state": "KA", "district": "BGM", "ward": 4}
+
+login = {
+    "voterId": "VoterId",
+    "password": "TestPass",
+}
+
+nodeRegister = {
+    "nodeAddress": "127.0.0.1:8000",
+}
+
+search = {
+    "blockHash": 12,
+    "blockNo": 45,
+    "fromVoter": 45,
+}
+
+signUp = {
+    "voterId": "VoterId",
+    "name": "Voter Name",
+    "mobile": 132456789,
+    "password": "TestPass",
+}

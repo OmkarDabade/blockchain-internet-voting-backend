@@ -1,61 +1,53 @@
-from block.vote_block import VoteBlock
-from constants import genesisBlockHash, difficultyVoteBlockchain, peers
+from block.vote import Vote
+from constants import *
 import requests
+from datetime import datetime
 
-# from blockchain import peers
 
-
-class VoteBlockchain:
+class Blockchain:
     """
     Blockchain class to store votes
     """
 
     def __init__(self):
-        self.previousIndex = 0
-        self.previousHash = genesisBlockHash
-        self.chain = []
+        self.previousIndex: int = 0
+        self.previousHash: str = genesisBlockHash
+        self.chain: list[Vote] = []
 
-    def addBlock(self, data):
+    def addBlock(self, candidateId: int, candidateName: str, fromVoter: str):
         """
         A function that adds the block to the chain after verification.
         """
+        print("Adding Block to chain")
 
         if len(self.chain) == 0:
-            newBlock = VoteBlock(
+            newBlock = Vote(
                 0,
-                data["voteTo"],
-                data["voteFrom"],
-                data["timestamp"],
+                candidateId,
+                candidateName,
+                fromVoter,
+                datetime.now(),
                 genesisBlockHash,
             )
 
-            # if not self.isValidProof(newBlock, newBlock.blockHash):
-            #     return False
-
             self.chain.append(newBlock)
-            # self.previousIndex += 1
             self.previousHash = newBlock.blockHash
         else:
-            newBlock = VoteBlock(
+            newBlock = Vote(
                 self.previousIndex + 1,
-                data["voteTo"],
-                data["voteFrom"],
-                data["timestamp"],
+                candidateId,
+                candidateName,
+                fromVoter,
+                datetime.now(),
                 self.previousHash,
             )
-
-            # if self.previousHash != newBlock.previousHash:
-            #     return False
-
-            # if not self.isValidProof(newBlock, newBlock.blockHash):
-            #     return False
 
             self.chain.append(newBlock)
             self.previousIndex += 1
             self.previousHash = newBlock.blockHash
             self.announceNewBlock(newBlock)
 
-    def acceptNewAnnouncedBlock(self, block):
+    def acceptNewAnnouncedBlock(self, block: Vote):
         """
         A function that adds the newly announced block to the chain after verification.
         """
@@ -92,31 +84,32 @@ class VoteBlockchain:
         return True
 
     @classmethod
-    def isValidProof(cls, block, blockHash):
+    def isValidProof(cls, block: Vote, blockHash: str):
         """
         Check if blockHash is valid hash of block and satisfies
         the difficulty criteria.
         """
         return (
-            blockHash.startswith("0" * difficultyVoteBlockchain)
+            blockHash.startswith("0" * blockchainDifficulty)
             and blockHash == block.computeHash()
         )
 
     @classmethod
-    def checkChainValidity(cls, chainDump):
+    def checkChainValidity(cls, chainDump: dict):
         result = True
         previousHash = genesisBlockHash
 
         for block_data in chainDump:
 
-            block = VoteBlock(
-                index=block_data["Block#"],
-                voteTo=block_data["Vote To"],
-                voteFrom=block_data["Vote From"],
-                timestamp=block_data["Time"],
-                previousHash=block_data["Previous Hash"],
-                blockHash=block_data["Block Hash"],
-                nonce=block_data["Nonce"],
+            block = Vote(
+                index=block_data["block#"],
+                candidateId=block_data["candidateId"],
+                candidateName=block_data["candidateName"],
+                fromVoter=block_data["fromVoter"],
+                timestamp=block_data["time"],
+                previousHash=block_data["previousHash"],
+                blockHash=block_data["blockHash"],
+                nonce=block_data["nonce"],
             )
 
             if (
@@ -130,7 +123,7 @@ class VoteBlockchain:
 
         return result
 
-    def announceNewBlock(self, block):
+    def announceNewBlock(self, block: Vote):
         """
         A function to announce to the network once a block has been mined.
         Other blocks can simply verify the proof of work and add it to their
@@ -143,23 +136,26 @@ class VoteBlockchain:
             return
 
         for peer in peers:
-            url = "{}/add_block".format(peer)
+            url = "{}/addBlock".format(peer)
             headers = {"Content-Type": "application/json"}
-            res = requests.post(url=url, json=block.toJson(), headers=headers)
-            print("Peer: ", peer)
-            print("API Response ", res.text)
-            if res.status_code == 200:
-                jsonData = res.json()
-                print("Resulst: ", jsonData["result"])
+            try:
+                res = requests.post(url=url, json=block.toJson(), headers=headers)
+                print("Peer: ", peer)
+                print("API Response ", res.text)
+                if res.status_code == 200:
+                    jsonData = res.json()
+                    print("Resulst: ", jsonData["result"])
 
-                if jsonData["result"] == True:
-                    print("res is True")
-                    if jsonData["data"]["Length"] != len(self.chain):
-                        self.consensus()
+                    if jsonData["result"] == True:
+                        print("res is True")
+                        if jsonData["data"]["Length"] != len(self.chain):
+                            self.consensus()
+            except:
+                print("Some error occured during annoucing block")
 
     def consensus(self):
         """
-        Our naive consnsus algorithm. If a longer valid chain is
+        Our naive consensus algorithm. If a longer valid chain is
         found, our chain is replaced with it.
         """
 

@@ -1,5 +1,4 @@
 from ivote.model import Voter
-from flask_jwt_extended.utils import create_access_token
 from ivote import iVoteApp, voterDb
 from flask import request, jsonify
 from werkzeug.security import generate_password_hash
@@ -9,10 +8,11 @@ from sqlalchemy.exc import IntegrityError
 @iVoteApp.route("/signup", methods=["POST"])
 def signup():
     print("/signup Called")
+    print("DATA RECIEVED:", request.data)
+
     try:
         if request.is_json:
             jsonData = request.get_json()
-            print("JSON DATA RECIEVED:", jsonData)
 
             if (
                 "voterId" in jsonData
@@ -32,15 +32,12 @@ def signup():
                 voterDb.session.commit()
                 print("adding done")
 
-                # access_token = create_access_token(identity=voter.voterId)
-
                 return (
                     jsonify(
                         {
                             "result": True,
                             "api": "/signup",
                             "result": "Successful Registration",
-                            # "token": access_token,
                             "url": request.url,
                         }
                     ),

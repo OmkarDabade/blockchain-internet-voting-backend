@@ -22,15 +22,15 @@ jwt = JWTManager(iVoteApp)
 
 from .chain import chain, get_chain
 from .index import index
-from .cast_vote import cast_vote
+from .castVote import castVote
 
 from .login import login
 from .search import search
-from .add_candidate import add_candidate
+from .addCandidate import addCandidate
 
-from .get_candidates import get_candidates
-from .add_block import add_block
+from .getCandidates import getCandidates
+from .addBlock import addBlock
 from .signup import signup
 
-from .create_chain_from_dump import create_chain_from_dump
-from .register_from_new_node import register_from_new_node
+from .createChainFromDump import createChainFromDump
+from .registerFromNewNode import registerFromNewNode

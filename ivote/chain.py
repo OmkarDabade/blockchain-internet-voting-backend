@@ -1,7 +1,6 @@
-from flask.globals import request
-from blockchain import voteBlockchain
+from blockchain import blockchain
 from ivote import iVoteApp
-from flask import jsonify
+from flask import jsonify, request
 from constants import peers
 
 # endpoint to return the node's copy of the chain.
@@ -9,7 +8,7 @@ from constants import peers
 def chain():
     print("/chain Called")
     chain = []
-    for block in voteBlockchain.chain:
+    for block in blockchain.chain:
         chain.append(block.toJson())
 
     return jsonify(
@@ -26,7 +25,7 @@ def chain():
 def get_chain():
     print("/get_chain Called")
     chain = []
-    for block in voteBlockchain.chain:
+    for block in blockchain.chain:
         chain.append(block.toJson())
 
     return {

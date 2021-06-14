@@ -8,10 +8,11 @@ from werkzeug.security import check_password_hash
 @iVoteApp.route("/login", methods=["GET", "POST"])
 def login():
     print("/GET login Called")
+    print("DATA RECIEVED:", request.data)
+
     try:
         if request.is_json:
             jsonData = request.get_json()
-            print("JSON DATA RECIEVED:", jsonData)
 
             if "voterId" in jsonData and "password" in jsonData:
                 print("Data is Here")
