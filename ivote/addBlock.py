@@ -6,9 +6,13 @@ from blockchain import blockchain
 
 @iVoteApp.route("/addBlock", methods=["POST"])
 def addBlock():
+    """
+    Node-to-Node API
+    """
+
     print("/addBlock Called")
     print("DATA RECIEVED:", request.data)
-    
+
     try:
         if request.is_json:
             jsonData = request.get_json()
@@ -42,7 +46,7 @@ def addBlock():
                             {
                                 "result": True,
                                 "data": get_chain(),
-                                "api": "/add_block",
+                                "api": "/addBlock",
                                 "url": request.url,
                             }
                         ),
@@ -53,7 +57,7 @@ def addBlock():
                         {
                             "result": False,
                             "error": "Block Not Added to chain",
-                            "api": "/add_block",
+                            "api": "/addBlock",
                             "url": request.url,
                         }
                     )
@@ -62,7 +66,7 @@ def addBlock():
                     {
                         "result": False,
                         "error": "Incomplete Data",
-                        "api": "/add_block",
+                        "api": "/addBlock",
                         "url": request.url,
                     }
                 )
@@ -72,7 +76,7 @@ def addBlock():
                 {
                     "result": False,
                     "error": "Invalid JSON Format",
-                    "api": "/add_block",
+                    "api": "/addBlock",
                     "url": request.url,
                 }
             )

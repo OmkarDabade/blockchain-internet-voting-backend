@@ -1,10 +1,16 @@
 from ivote import iVoteApp
 from flask import jsonify, request
 from blockchain import blockchain
+from flask_jwt_extended import jwt_required
 
 
 @iVoteApp.route("/castVote", methods=["POST"])
+@jwt_required()
 def castVote():
+    """
+    Client-to-Node API
+    """
+
     print("/castVote Called")
     print("DATA RECIEVED:", request.data)
 
@@ -26,7 +32,7 @@ def castVote():
                     {
                         "result": True,
                         "data": blockchain.chain[-1].toJson(),
-                        "api": "/cast_vote",
+                        "api": "/castVote",
                         "url": request.url,
                     }
                 )
@@ -35,7 +41,7 @@ def castVote():
                     {
                         "result": False,
                         "error": "Incomplete Data",
-                        "api": "/cast_vote",
+                        "api": "/castVote",
                         "url": request.url,
                     }
                 )
@@ -45,7 +51,7 @@ def castVote():
                 {
                     "result": False,
                     "error": "Invalid JSON Format",
-                    "api": "/cast_vote",
+                    "api": "/castVote",
                     "url": request.url,
                 }
             )
@@ -55,7 +61,7 @@ def castVote():
             {
                 "result": False,
                 "error": "Some error occured",
-                "api": "/cast_vote",
+                "api": "/castVote",
                 "url": request.url,
             }
         )

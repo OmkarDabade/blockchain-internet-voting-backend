@@ -7,6 +7,10 @@ from constants import peers
 # endpoint to add new peers to the network.
 @iVoteApp.route("/registerFromNewNode", methods=["POST"])
 def registerFromNewNode():
+    """
+    Node-to-Node API
+    """
+
     print("/registerFromNewNode Called")
     print("DATA RECIEVED:", request.data)
 
@@ -21,7 +25,7 @@ def registerFromNewNode():
                     {
                         "result": False,
                         "error": "Node Address not avialable in request",
-                        "api": "/register_from_new_node",
+                        "api": "/registerFromNewNode",
                         "url": request.url,
                     }
                 )
@@ -49,7 +53,7 @@ def registerFromNewNode():
                 {
                     "result": True,
                     "data": "Registration Successful",
-                    "api": "/register_from_new_node",
+                    "api": "/registerFromNewNode",
                     "url": request.url,
                 }
             )
@@ -63,7 +67,7 @@ def registerFromNewNode():
                 {
                     "result": False,
                     "error": "Invalid JSON Format",
-                    "api": "/register_from_new_node",
+                    "api": "/registerFromNewNode",
                     "url": request.url,
                 }
             )
@@ -72,7 +76,7 @@ def registerFromNewNode():
             {
                 "result": False,
                 "error": "Some error occured",
-                "api": "/register_from_new_node",
+                "api": "/registerFromNewNode",
                 "url": request.url,
             }
         )

@@ -1,12 +1,16 @@
-from .model import Voter
 from flask_jwt_extended.utils import create_access_token
 from ivote import iVoteApp
+from database import voterDb
 from flask import request, jsonify
 from werkzeug.security import check_password_hash
 
 
 @iVoteApp.route("/login", methods=["GET", "POST"])
 def login():
+    """
+    Client-to-Node API
+    """
+
     print("/GET login Called")
     print("DATA RECIEVED:", request.data)
 
@@ -17,9 +21,10 @@ def login():
             if "voterId" in jsonData and "password" in jsonData:
                 print("Data is Here")
 
-                user = Voter.query.filter_by(voterId=jsonData["voterId"]).first()
+                # user = Voter.query.filter_by(voterId=jsonData["voterId"]).first()
+                voter = voterDb.getVoter(jsonData["voterId"])
 
-                if not user:
+                if not voter:
                     return (
                         jsonify(
                             {
@@ -32,10 +37,8 @@ def login():
                         404,
                     )
 
-                if check_password_hash(user.passwordHash, jsonData["password"]):
-
+                if check_password_hash(voter.passwordHash, jsonData["password"]):
                     access_token = create_access_token(identity=jsonData["voterId"])
-
                     return jsonify(
                         {
                             "result": True,

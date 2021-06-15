@@ -2,15 +2,17 @@ from database.model import Voter
 from ivote import iVoteApp, voterDb
 from flask import request, jsonify
 from werkzeug.security import generate_password_hash
+from sqlalchemy.exc import IntegrityError
 
 
-@iVoteApp.route("/signup", methods=["POST"])
+@iVoteApp.route("/addVoter", methods=["POST"])
 def signup():
     """
-    Client-to-Authority API
+    Node-to-Node API\n
+    Authority-to-Node API
     """
 
-    print("/signup Called")
+    print("/addVoter Called")
     print("DATA RECIEVED:", request.data)
 
     try:
@@ -29,16 +31,11 @@ def signup():
                 voter = Voter(
                     voterId=jsonData["voterId"],
                     name=jsonData["name"],
-                    state=jsonData["state"],
-                    district=jsonData["district"],
-                    ward=jsonData["ward"],
                     mobile=jsonData["mobile"],
                     passwordHash=generate_password_hash(jsonData["password"]),
                 )
                 print("adding data")
                 # insert user
-                # voterDb.session.add(voter)
-                # voterDb.session.commit()
                 added = voterDb.addVoter(voter)
                 if added:
                     print("adding done")
@@ -46,7 +43,7 @@ def signup():
                         jsonify(
                             {
                                 "result": True,
-                                "api": "/signup",
+                                "api": "/addVoter",
                                 "result": "Successful Registration",
                                 "url": request.url,
                             }
@@ -58,58 +55,49 @@ def signup():
                     return jsonify(
                         {
                             "result": False,
-                            "api": "/signup",
+                            "api": "/addVoter",
                             "error": "Registration Failed in Database",
                             "url": request.url,
                         }
                     )
-
-            else:
-                return jsonify(
-                    {
-                        "result": False,
-                        "error": "Incomplete Data",
-                        "api": "/signup",
-                        "url": request.url,
-                    }
-                )
 
         else:
             return jsonify(
                 {
                     "result": False,
                     "error": "Invalid JSON Format",
-                    "api": "/signup",
+                    "api": "/addVoter",
                     "url": request.url,
                 }
             )
 
-    # except IntegrityError:
-    #     voterDb.session.rollback()
-    #     return jsonify(
-    #         {
-    #             "result": False,
-    #             "error": "Voter Db Rollback\nUser already exists",
-    #             "api": "/signup",
-    #             "url": request.url,
-    #         }
-    #     )
-    # except AttributeError:
-    #     return jsonify(
-    #         {
-    #             "result": False,
-    #             "error": "Provide data in json format",
-    #             "api": "/signup",
-    #             "url": request.url,
-    #         }
-    #     )
+    except IntegrityError:
+        voterDb.session.rollback()
+        return jsonify(
+            {
+                "result": False,
+                "error": "Voter Db Rollback\nUser already exists",
+                "api": "/addVoter",
+                "url": request.url,
+            }
+        )
+    except AttributeError:
+        voterDb.session.rollback()
+        return jsonify(
+            {
+                "result": False,
+                "error": "Provide data in json format",
+                "api": "/addVoter",
+                "url": request.url,
+            }
+        )
 
     except:
         return jsonify(
             {
                 "result": False,
                 "error": "Some error occured",
-                "api": "/signup",
+                "api": "/addVoter",
                 "url": request.url,
             }
         )

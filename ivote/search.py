@@ -5,6 +5,10 @@ from blockchain import blockchain
 
 @iVoteApp.route("/search", methods=["GET"])
 def search():
+    """
+    Client-to-Node API
+    """
+
     print("/search Called")
     print("DATA RECIEVED:", request.data)
 

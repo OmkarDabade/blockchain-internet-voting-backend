@@ -6,6 +6,10 @@ from ivote import iVoteApp, get_chain
 
 @iVoteApp.route("/createChainFromDump", methods=["POST"])
 def createChainFromDump():
+    """
+    Node-to-Node API
+    """
+
     print("/createChainFromDump Called")
     print("DATA RECIEVED:", request.data)
 
@@ -36,7 +40,7 @@ def createChainFromDump():
                         {
                             "result": False,
                             "error": "Block# %s Not Added to Chain" % str(block.index),
-                            "api": "/create_chain_from_dump",
+                            "api": "/createChainFromDump",
                             "url": request.url,
                         }
                     )
@@ -48,7 +52,7 @@ def createChainFromDump():
                 {
                     "result": True,
                     "data": "Creating blockchain from dump successful",
-                    "api": "/create_chain_from_dump",
+                    "api": "/createChainFromDump",
                     "url": request.url,
                 }
             )
@@ -58,7 +62,7 @@ def createChainFromDump():
                 {
                     "result": False,
                     "error": "Invalid JSON Format",
-                    "api": "/create_chain_from_dump",
+                    "api": "/createChainFromDump",
                     "url": request.url,
                 }
             )
@@ -67,7 +71,7 @@ def createChainFromDump():
             {
                 "result": False,
                 "error": "Some error occured",
-                "api": "/create_chain_from_dump",
+                "api": "/createChainFromDump",
                 "url": request.url,
             }
         )

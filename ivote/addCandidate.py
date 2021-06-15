@@ -5,6 +5,10 @@ from blockchain import candidateList, candidates
 
 @iVoteApp.route("/addCandidate", methods=["POST"])
 def addCandidate():
+    """
+    Node-to-Node API\n
+    Auhority-to-Node API
+    """
     print("/addCandidate Called")
     print("DATA RECIEVED:", request.data)
 
@@ -31,7 +35,7 @@ def addCandidate():
                     {
                         "result": True,
                         "data": candidateList[-1].toJson(),
-                        "api": "/add_candidate",
+                        "api": "/addCandidate",
                         "url": request.url,
                     }
                 )
@@ -40,7 +44,7 @@ def addCandidate():
                     {
                         "result": False,
                         "error": "Incomplete Data",
-                        "api": "/add_candidate",
+                        "api": "/addCandidate",
                         "url": request.url,
                     }
                 )
@@ -50,7 +54,7 @@ def addCandidate():
                 {
                     "result": False,
                     "error": "Invalid JSON Format",
-                    "api": "/add_candidate",
+                    "api": "/addCandidate",
                     "url": request.url,
                 }
             )
@@ -60,7 +64,7 @@ def addCandidate():
             {
                 "result": False,
                 "error": "Some error occured",
-                "api": "/add_candidate",
+                "api": "/addCandidate",
                 "url": request.url,
             }
         )

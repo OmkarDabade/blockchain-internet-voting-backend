@@ -1,6 +1,9 @@
+from flask.json import jsonify
+from database import voterDb
 from flask import Flask
 from flask_jwt_extended import JWTManager
-from flask_sqlalchemy import SQLAlchemy
+
+# from flask_sqlalchemy import SQLAlchemy
 
 
 iVoteApp = Flask(__name__)
@@ -13,9 +16,11 @@ iVoteApp.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
 # creates SQLALCHEMY object
 # voterDb = SQLAlchemy(app=iVoteApp)
-voterDb = SQLAlchemy()
 
-voterDb.init_app(iVoteApp)
+voterDb.database.init_app(iVoteApp)
+
+# voterDb = SQLAlchemy()
+# voterDb.init_app(iVoteApp)
 
 jwt = JWTManager(iVoteApp)
 
@@ -34,3 +39,19 @@ from .signup import signup
 
 from .createChainFromDump import createChainFromDump
 from .registerFromNewNode import registerFromNewNode
+
+
+@iVoteApp.route("/voters", methods=["GET"])
+def voters():
+    print("/voters Called")
+    chain = []
+    for voter in voterDb.getAllVoters():
+        chain.append(voter.toJson())
+
+    return jsonify(
+        {
+            "Length": len(chain),
+            "Voters": chain,
+            "api": "/voters",
+        }
+    )

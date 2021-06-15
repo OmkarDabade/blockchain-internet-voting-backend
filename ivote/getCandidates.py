@@ -5,6 +5,10 @@ from blockchain import candidateList
 
 @iVoteApp.route("/getCandidates", methods=["GET"])
 def getCandidates():
+    """
+    Client-to-Node API
+    """
+
     print("/getCandidates Called")
     print("DATA RECIEVED:", request.data)
 
@@ -22,7 +26,7 @@ def getCandidates():
                         {
                             "result": True,
                             "data": chain,
-                            "api": "/get_candidates",
+                            "api": "/getCandidates",
                             "url": request.url,
                         }
                     ),
@@ -46,7 +50,7 @@ def getCandidates():
                         {
                             "result": True,
                             "data": chain,
-                            "api": "/get_candidates",
+                            "api": "/getCandidates",
                             "url": request.url,
                         }
                     ),
@@ -66,7 +70,7 @@ def getCandidates():
                         {
                             "result": True,
                             "data": chain,
-                            "api": "/get_candidates",
+                            "api": "/getCandidates",
                             "url": request.url,
                         }
                     ),
@@ -78,7 +82,7 @@ def getCandidates():
                     {
                         "result": False,
                         "error": "Incomplete Data",
-                        "api": "/get_candidates",
+                        "api": "/getCandidates",
                         "url": request.url,
                     }
                 )
@@ -88,7 +92,7 @@ def getCandidates():
                 {
                     "result": False,
                     "error": "Invalid JSON Format",
-                    "api": "/get_candidates",
+                    "api": "/getCandidates",
                     "url": request.url,
                 }
             )
@@ -98,7 +102,7 @@ def getCandidates():
             {
                 "result": False,
                 "error": "Some error occured",
-                "api": "/get_candidates",
+                "api": "/getCandidates",
                 "url": request.url,
             }
         )

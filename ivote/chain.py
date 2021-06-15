@@ -6,6 +6,11 @@ from constants import peers
 # endpoint to return the node's copy of the chain.
 @iVoteApp.route("/chain", methods=["GET"])
 def chain():
+    """
+    Client-to-Node API\n
+    Authority-to-Node API
+    """
+
     print("/chain Called")
     chain = []
     for block in blockchain.chain:
@@ -23,6 +28,9 @@ def chain():
 
 
 def get_chain():
+    """
+    Node-to-Node API
+    """
     print("/get_chain Called")
     chain = []
     for block in blockchain.chain:
