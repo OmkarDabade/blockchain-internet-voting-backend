@@ -1,4 +1,6 @@
-from database.model import Voter
+from database import adminDb
+from database.adminModel import Admin
+from database.voterModel import Voter
 from ivote import iVoteApp, voterDb
 from flask import request, jsonify
 from werkzeug.security import generate_password_hash
@@ -35,10 +37,8 @@ def signup():
                     mobile=jsonData["mobile"],
                     passwordHash=generate_password_hash(jsonData["password"]),
                 )
-                print("adding data")
+                print("adding voter")
                 # insert user
-                # voterDb.session.add(voter)
-                # voterDb.session.commit()
                 added = voterDb.addVoter(voter)
                 if added:
                     print("adding done")
@@ -47,19 +47,56 @@ def signup():
                             {
                                 "result": True,
                                 "api": "/signup",
-                                "result": "Successful Registration",
+                                "result": "Successful Voter Registration",
                                 "url": request.url,
                             }
                         ),
                         200,
                     )
                 else:
-                    print("Could not Add User")
+                    print("Could not Add Voter")
                     return jsonify(
                         {
                             "result": False,
                             "api": "/signup",
-                            "error": "Registration Failed in Database",
+                            "error": "Voter Registration Failed in Database",
+                            "url": request.url,
+                        }
+                    )
+
+            elif (
+                "loginId" in jsonData
+                and "name" in jsonData
+                and "password" in jsonData
+            ):
+                admin = Admin(
+                    loginId=jsonData["loginId"],
+                    name=jsonData["name"],
+                    passwordHash=generate_password_hash(jsonData["password"]),
+                )
+                print("adding admin")
+                # insert admin
+                added = adminDb.addAdmin(admin)
+                if added:
+                    print("adding done")
+                    return (
+                        jsonify(
+                            {
+                                "result": True,
+                                "api": "/signup",
+                                "result": "Successful Admin Registration",
+                                "url": request.url,
+                            }
+                        ),
+                        200,
+                    )
+                else:
+                    print("Could not Add Admin")
+                    return jsonify(
+                        {
+                            "result": False,
+                            "api": "/signup",
+                            "error": "Admin Registration Failed in Database",
                             "url": request.url,
                         }
                     )

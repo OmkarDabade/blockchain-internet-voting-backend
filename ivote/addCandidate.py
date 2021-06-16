@@ -1,9 +1,11 @@
+from database import adminRequired
 from ivote import iVoteApp
 from flask import request, jsonify
 from blockchain import candidateList, candidates
 
 
 @iVoteApp.route("/addCandidate", methods=["POST"])
+@adminRequired(api="/addCandidate")
 def addCandidate():
     """
     Node-to-Node API\n

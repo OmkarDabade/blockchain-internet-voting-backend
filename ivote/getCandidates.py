@@ -1,9 +1,11 @@
+from flask_jwt_extended.view_decorators import jwt_required
 from ivote import iVoteApp
 from flask import request, jsonify
 from blockchain import candidateList
 
 
 @iVoteApp.route("/getCandidates", methods=["GET"])
+@jwt_required()
 def getCandidates():
     """
     Client-to-Node API

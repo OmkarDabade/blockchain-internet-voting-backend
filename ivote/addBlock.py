@@ -1,5 +1,6 @@
 from block.vote import Vote
-from ivote import iVoteApp, get_chain
+from ivote import iVoteApp
+from ivote.chain import get_chain
 from flask import request, jsonify
 from blockchain import blockchain
 

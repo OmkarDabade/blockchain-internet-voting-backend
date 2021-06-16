@@ -1,9 +1,14 @@
+from constants import ROLEVOTER
 from database import voterDb
 from sqlalchemy import Column, String, Boolean, Integer
 
 
 # Database ORMs
 class Voter(voterDb.database.Model):
+
+    __tablename__ = "voters"
+    __bind_key__ = ROLEVOTER
+
     id = Column("Id", Integer, autoincrement=True, primary_key=True)
     voterId = Column("Voter Id", String(15), unique=True)
     name = Column("Name", String(60))

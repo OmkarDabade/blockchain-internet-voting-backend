@@ -1,4 +1,5 @@
-from database.model import Voter
+from database import adminRequired
+from database.voterModel import Voter
 from ivote import iVoteApp, voterDb
 from flask import request, jsonify
 from werkzeug.security import generate_password_hash
@@ -6,7 +7,8 @@ from sqlalchemy.exc import IntegrityError
 
 
 @iVoteApp.route("/addVoter", methods=["POST"])
-def signup():
+@adminRequired(api="/addVoter")
+def addVoter():
     """
     Node-to-Node API\n
     Authority-to-Node API
@@ -44,19 +46,19 @@ def signup():
                             {
                                 "result": True,
                                 "api": "/addVoter",
-                                "result": "Successful Registration",
+                                "result": "Successfully Added voter",
                                 "url": request.url,
                             }
                         ),
                         200,
                     )
                 else:
-                    print("Could not Add User")
+                    print("Could not Add Voter")
                     return jsonify(
                         {
                             "result": False,
                             "api": "/addVoter",
-                            "error": "Registration Failed in Database",
+                            "error": "Voter Failed to add in Database",
                             "url": request.url,
                         }
                     )
