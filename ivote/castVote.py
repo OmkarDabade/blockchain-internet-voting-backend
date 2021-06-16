@@ -5,7 +5,7 @@ from flask_jwt_extended import jwt_required
 
 
 @iVoteApp.route("/castVote", methods=["POST"])
-@jwt_required()
+# @jwt_required()
 def castVote():
     """
     Client-to-Node API

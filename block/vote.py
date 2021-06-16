@@ -67,7 +67,7 @@ class Vote:
             "candidateId": self.candidateId,
             "candidateName": self.candidateName,
             "fromVoter": self.fromVoter,
-            "time": self.timestamp,
+            "time": self.timestamp.isoformat(),
             "nonce": self.nonce,
             "blockHash": self.blockHash,
             "previousHash": self.previousBlockHash,

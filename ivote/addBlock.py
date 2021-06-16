@@ -1,3 +1,4 @@
+from datetime import datetime
 from block.vote import Vote
 from ivote import iVoteApp
 from ivote.chain import get_chain
@@ -33,7 +34,7 @@ def addBlock():
                     jsonData["candidateId"],
                     jsonData["candidateName"],
                     jsonData["fromVoter"],
-                    jsonData["time"],
+                    datetime.fromisoformat(jsonData["time"]),
                     jsonData["previousHash"],
                     blockHash=jsonData["blockHash"],
                     nonce=jsonData["nonce"],

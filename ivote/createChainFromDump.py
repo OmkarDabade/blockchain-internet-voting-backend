@@ -1,3 +1,4 @@
+from datetime import datetime
 from blockchain import blockchain
 from flask import request, jsonify
 from block.vote import Vote
@@ -25,12 +26,12 @@ def createChainFromDump():
                     candidateId=block_data["candidateId"],
                     candidateName=block_data["candidateName"],
                     fromVoter=block_data["fromVoter"],
-                    timestamp=block_data["time"],
+                    timestamp=datetime.fromisoformat(block_data["time"]),
                     previousHash=block_data["previousHash"],
                     blockHash=block_data["blockHash"],
                     nonce=block_data["nonce"],
                 )
-                print("Block#:", block.index)
+                print("Block:", block)
 
                 added = blockchain.acceptNewAnnouncedBlock(block)
                 if not added:

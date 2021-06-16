@@ -14,72 +14,72 @@ def registerFromNewNode():
     print("/registerFromNewNode Called")
     print("DATA RECIEVED:", request.data)
 
-    try:
-        if request.is_json:
-            jsonData = request.get_json()
+    # try:
+    if request.is_json:
+        jsonData = request.get_json()
 
-            nodeAddress = jsonData["nodeAddress"]
+        newNodeAddress = jsonData["newNodeAddress"]
 
-            if not nodeAddress:
-                return jsonify(
-                    {
-                        "result": False,
-                        "error": "Node Address not avialable in request",
-                        "api": "/registerFromNewNode",
-                        "url": request.url,
-                    }
-                )
-
-            # Add the node to the peer list
-            peers.add(nodeAddress)
-
-            data = get_chain()
-            print(data)
-            header = {"Content-Type": "application/json"}
-
-            # Make a request to register with remote node and send information
-            res = requests.post(
-                url=nodeAddress + "/createChainFromDump",
-                json=data,
-                headers=header,
-            )
-
-            print(
-                "Result After Making Post request create_chain_from_dump:",
-                res.text,
-            )
-
-            return jsonify(
-                {
-                    "result": True,
-                    "data": "Registration Successful",
-                    "api": "/registerFromNewNode",
-                    "url": request.url,
-                }
-            )
-            # if response.json()["result"] == "True":
-            #     return jsonify({"result": True, "data": "Registration Successful"})
-            # else:
-            #     return jsonify({"result": False, "error": "unknown Error Occured"})
-
-        else:
+        if not newNodeAddress:
             return jsonify(
                 {
                     "result": False,
-                    "error": "Invalid JSON Format",
+                    "error": "Node Address not avialable in request",
                     "api": "/registerFromNewNode",
                     "url": request.url,
                 }
             )
-    except:
+
+        # Add the node to the peer list
+        peers.add(str(newNodeAddress))
+
+        chainData = get_chain()
+        print(chainData)
+        header = {"Content-Type": "application/json"}
+
+        # Make a request to register with remote node and send information
+        res = requests.post(
+            url=str(newNodeAddress) + "/createChainFromDump",
+            json=chainData,
+            headers=header,
+        )
+
+        print(
+            "Result After Making Post request create_chain_from_dump:",
+            res.text,
+        )
+
         return jsonify(
             {
-                "result": False,
-                "error": "Some error occured",
+                "result": True,
+                "data": "Registration Successful",
                 "api": "/registerFromNewNode",
                 "url": request.url,
             }
         )
+        # if response.json()["result"] == "True":
+        #     return jsonify({"result": True, "data": "Registration Successful"})
+        # else:
+        #     return jsonify({"result": False, "error": "unknown Error Occured"})
+
+    else:
+        return jsonify(
+            {
+                "result": False,
+                "error": "Invalid JSON Format",
+                "api": "/registerFromNewNode",
+                "url": request.url,
+            }
+        )
+    # except:
+    #     return jsonify(
+    #         {
+    #             "result": False,
+    #             "error": "Some error occured",
+    #             "api": "/registerFromNewNode",
+    #             "url": request.url,
+    #         }
+    #     )
 
     # Return the consensus blockchain to the newly registered node
     # so that he can sync

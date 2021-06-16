@@ -31,7 +31,7 @@ def get_chain():
     """
     Node-to-Node API
     """
-    print("/get_chain Called")
+    print("/getChain Called")
     chain = []
     for block in blockchain.chain:
         chain.append(block.toJson())
@@ -41,5 +41,5 @@ def get_chain():
         "Chain": chain,
         "Peers": list(peers),
         "url": request.url,
-        "api": "/chain",
+        "api": "/getChain",
     }

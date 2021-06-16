@@ -1,7 +1,8 @@
+from datetime import datetime
 import requests
 
-baseUrl = "http://127.0.0.1:8000"
-endpoint = "/cast_vote"
+baseUrl = "http://127.0.0.1:7457"
+endpoint = "/castVote"
 headers = {"Content-Type": "application/json"}
 jsonData = {
     "candidateId": "MyCID",
@@ -12,12 +13,12 @@ jsonData = {
 }
 
 url = baseUrl + endpoint
-print(url)
+# print(url)
 
-r = requests.post(url=url, json=jsonData, headers=headers)
+# r = requests.post(url=url, json=jsonData, headers=headers)
 
-print("Response is:", r.json())
-print(type(r.json()["result"]))
+# print("Response is:", r.json())
+# print(type(r.json()["result"]))
 
 addCandidate = {
     "candidateId": 1234,
@@ -56,3 +57,9 @@ signUp = {
     "mobile": 132456789,
     "password": "TestPass",
 }
+
+
+now = datetime.now()
+print(now)
+
+print(now.isoformat(), datetime.fromisoformat(now.isoformat()))

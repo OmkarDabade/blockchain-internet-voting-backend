@@ -106,7 +106,7 @@ class Blockchain:
                 candidateId=block_data["candidateId"],
                 candidateName=block_data["candidateName"],
                 fromVoter=block_data["fromVoter"],
-                timestamp=block_data["time"],
+                timestamp=datetime.fromisoformat(block_data["time"]),
                 previousHash=block_data["previousHash"],
                 blockHash=block_data["blockHash"],
                 nonce=block_data["nonce"],
@@ -138,13 +138,14 @@ class Blockchain:
         for peer in peers:
             url = "{}/addBlock".format(peer)
             headers = {"Content-Type": "application/json"}
+            print(url)
             try:
                 res = requests.post(url=url, json=block.toJson(), headers=headers)
                 print("Peer: ", peer)
                 print("API Response ", res.text)
                 if res.status_code == 200:
                     jsonData = res.json()
-                    print("Resulst: ", jsonData["result"])
+                    print("Result: ", jsonData["result"])
 
                     if jsonData["result"] == True:
                         print("res is True")
