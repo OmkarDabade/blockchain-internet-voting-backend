@@ -9,7 +9,6 @@ def syncChain():
     Node-to-Node API
     """
     print("/syncChain Called")
-    print("DATA RECIEVED:", request.data)
 
     try:
         if request.method == "GET":
@@ -23,11 +22,12 @@ def syncChain():
                 }
             )
         else:
+            print("DATA RECIEVED:", request.data)
             if request.is_json:
                 jsonData = request.get_json()
                 receivedChainDump = jsonData["chain"]
 
-                if len(blockchain.chain) != jsonData["length"]:
+                if len(blockchain.chain) != len(receivedChainDump):
                     added = blockchain.syncChain(receivedChainDump)
                     if added:
                         print("Successfully Synced Chain")

@@ -9,7 +9,6 @@ def syncPeers():
     Node-to-Node API
     """
     print("/syncPeers Called")
-    print("DATA RECIEVED:", request.data)
 
     try:
         if request.method == "GET":
@@ -23,11 +22,12 @@ def syncPeers():
                 }
             )
         else:
+            print("DATA RECIEVED:", request.data)
             if request.is_json:
                 jsonData = request.get_json()
                 receivedPeers = jsonData["peers"]
 
-                print("URL:", request.url)
+                # print("URL:", request.url)
                 # parsedUri = urlparse(request.url)
                 # print("Parsed URL:", parsedUri)
                 # currentNodeAddress = "{uri.scheme}://{uri.netloc}".format(uri=parsedUri)

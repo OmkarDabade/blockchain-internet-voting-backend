@@ -47,8 +47,8 @@ def registerFromNewNode():
         # }
         # # header = {"Content-Type": "application/json"}
 
-        # # Add the node to the peer list
-        # peers.add(str(newNodeAddress))
+        # Add the node to the peer list
+        peers.add(str(newNodeAddress))
 
         # # Make a request to register with remote node and send information
         # res = requests.post(
@@ -59,6 +59,7 @@ def registerFromNewNode():
         # print("Result After Making Post req /syncAllData:", res.text)
 
         res = blockchain.consensus()
+
         if res:
             return jsonify(
                 {

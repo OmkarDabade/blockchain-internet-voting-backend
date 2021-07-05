@@ -135,6 +135,8 @@ class Blockchain:
                 newChain.append(vote)
 
             self.chain = newChain
+            self.previousIndex = self.chain[-1].index
+            self.previousHash = self.chain[-1].blockHash
             print("Successfully synced the chain")
         else:
             print("Chain is tampered unable to sync")
@@ -191,7 +193,6 @@ class Blockchain:
             print("No registerd peers, returning...")
             return
 
-        print("URL:", request.url)
         print("CURRENT NODE ADDRESS: ", request.host_url)
 
         # Peers
@@ -209,31 +210,35 @@ class Blockchain:
                 longestPeerList = jsonData["peers"]
                 currentPeerLength = jsonData["length"]
 
+        # If there is no longestPeerList then we sync current list with all nodes
+        if longestPeerList == None:
+            longestPeerList = list(peers)
+            currentPeerLength = len(peers)
+
         # If long peer list avialable sync it with current node
-        if longestPeerList:
+        if len(longestPeerList) != len(peers):
             for peer in longestPeerList:
                 if request.host_url != peer:
                     peers.add(str(peer))
 
-            newPeers: list = list(peers)
-            newPeers.append(request.host_url)
+        newPeers: list = list(peers)
+        newPeers.append(request.host_url)
 
-            # longestPeerList = None
-            currentPeerLength = len(peers)
-            print("Syncing Peers with other nodes")
+        currentPeerLength = len(peers)
+        print("Syncing Peers with other nodes")
 
-            # Sync longest peer list among all nodes
-            for node in peers:
-                response = requests.get("{}syncPeers".format(node))
-                jsonData = response.json()
-                if jsonData["length"] != currentPeerLength:
-                    resp = requests.post(
-                        url="{}syncPeers".format(node),
-                        json={"peers": newPeers},
-                        headers=POST_HEADERS,
-                    )
-                    if resp.status_code != 200:
-                        print("Unable to Sync Peers with Node:", node)
+        # Sync longest peer list among all nodes
+        for node in peers:
+            response = requests.get("{}syncPeers".format(node))
+            jsonData = response.json()
+            if jsonData["length"] != currentPeerLength:
+                resp = requests.post(
+                    url="{}syncPeers".format(node),
+                    json={"peers": newPeers},
+                    headers=POST_HEADERS,
+                )
+                if resp.status_code != 200:
+                    print("Unable to Sync Peers with Node:", node)
 
         # Chain
         # -----------------------------------------------------------------------------
@@ -252,34 +257,40 @@ class Blockchain:
                 longestValidChainDump = jsonData["chain"]
                 currentChainLength = jsonData["length"]
 
+        # If there is no longestValidChainDump then we sync current chain with all nodes
+        if longestValidChainDump == None:
+            longestValidChainDump = self.getChainInJson()
+            currentChainLength = len(self.chain)
+
         # If longest valid chain avialable sync it with current node
-        if longestValidChainDump:
+
+        if len(longestValidChainDump) != len(self.chain):
             self.syncChain(longestValidChainDump)
 
-            # longestPeerList = None
-            currentChainLength = len(self.chain)
-            print("Syncing chain with current node")
+        # longestPeerList = None
+        currentChainLength = len(self.chain)
+        print("Syncing chain with current node")
 
-            # Sync longest valid chain among all nodes
-            for node in peers:
-                response = requests.get("{}syncChain".format(node))
-                jsonData = response.json()
+        # Sync longest valid chain among all nodes
+        for node in peers:
+            response = requests.get("{}syncChain".format(node))
+            jsonData = response.json()
 
-                if jsonData["length"] != currentChainLength or not self.isChainValid(
-                    jsonData["chain"]
-                ):
-                    resp = requests.post(
-                        url="{}syncChain".format(node),
-                        json={"chain": self.getChainInJson()},
-                        headers=POST_HEADERS,
-                    )
-                    if resp.status_code != 200:
-                        print("Unable to Sync Chain with Node:", node)
+            if jsonData["length"] != currentChainLength or not self.isChainValid(
+                jsonData["chain"]
+            ):
+                resp = requests.post(
+                    url="{}syncChain".format(node),
+                    json={"chain": self.getChainInJson()},
+                    headers=POST_HEADERS,
+                )
+                if resp.status_code != 200:
+                    print("Unable to Sync Chain with Node:", node)
 
         # Candidates
         # -----------------------------------------------------------------------------
 
-        print("Syncing Candidates")
+        print("Getting Candidates")
         longestCandidateData = None
         currentCandidateDataLength = len(candidateList)
 
@@ -291,33 +302,38 @@ class Blockchain:
                 longestCandidateData = jsonData["candidates"]
                 currentCandidateDataLength = jsonData["length"]
 
+        # If there is no longestCandidateData then we sync current list with all nodes
+        if longestCandidateData == None:
+            longestCandidateData = candidates.getAllCandidatesInJson()
+            currentCandidateDataLength = len(candidateList)
+
         # If longest candidate list avialable sync it with current node
-        if longestCandidateData:
+        if len(longestCandidateData) != len(candidateList):
             for candidateData in longestCandidateData:
                 candidate = Candidate.fromJson(candidateData)
                 if candidate.candidateId not in candidateList:
                     candidateList.append(candidate)
 
-            currentCandidateDataLength = len(candidateList)
-            print("Syncing Candidates")
+        currentCandidateDataLength = len(candidateList)
+        print("Syncing Candidates")
 
-            # Sync longest candidate list among all nodes
-            for node in peers:
-                response = requests.get("{}syncCandidates".format(node))
-                jsonData = response.json()
-                if jsonData["length"] != currentCandidateDataLength:
-                    resp = requests.post(
-                        url="{}syncCandidates".format(node),
-                        json={"candidates": candidates.getAllCandidatesInJson()},
-                        headers=POST_HEADERS,
-                    )
-                    if resp.status_code != 200:
-                        print("Unable to Sync Canidates with Node:", node)
+        # Sync longest candidate list among all nodes
+        for node in peers:
+            response = requests.get("{}syncCandidates".format(node))
+            jsonData = response.json()
+            if jsonData["length"] != currentCandidateDataLength:
+                resp = requests.post(
+                    url="{}syncCandidates".format(node),
+                    json={"candidates": candidates.getAllCandidatesInJson()},
+                    headers=POST_HEADERS,
+                )
+                if resp.status_code != 200:
+                    print("Unable to Sync Canidates with Node:", node)
 
         # Voter Database
         # -----------------------------------------------------------------------------
 
-        print("Syncing Voter Database")
+        print("Getting Voter Database")
         largestVoterDatabase = None
         currentVoterDatabaseLength = voterDb.totalVoters()
 
@@ -329,8 +345,13 @@ class Blockchain:
                 largestVoterDatabase = jsonData["voters"]
                 currentVoterDatabaseLength = jsonData["length"]
 
+        # If there is no largestVoterDatabase then we sync current database with all nodes
+        if largestVoterDatabase == None:
+            largestVoterDatabase = voterDb.getAllVotersInJson()
+            currentVoterDatabaseLength = voterDb.totalVoters()
+
         # If large voterDb is avialable sync it with current node
-        if largestVoterDatabase:
+        if len(largestVoterDatabase) != voterDb.totalVoters():
             for voterData in largestVoterDatabase:
                 newVoter = Voter.fromJson(voterData)
                 voter = voterDb.getVoter(newVoter.voterId)
@@ -339,26 +360,26 @@ class Blockchain:
                 if voter == None:
                     voterDb.addVoter(newVoter)
 
-            currentVoterDatabaseLength = voterDb.totalVoters()
-            print("Syncing VoterDb")
+        currentVoterDatabaseLength = voterDb.totalVoters()
+        print("Syncing VoterDb")
 
-            # Sync largest voterDb among all nodes
-            for node in peers:
-                response = requests.get("{}syncVoterDatabase".format(node))
-                jsonData = response.json()
-                if jsonData["length"] != currentVoterDatabaseLength:
-                    resp = requests.post(
-                        url="{}syncVoterDatabase".format(node),
-                        json={"voters": voterDb.getAllVotersInJson()},
-                        headers=POST_HEADERS,
-                    )
-                    if resp.status_code != 200:
-                        print("Unable to Sync VoterDb with Node:", node)
+        # Sync largest voterDb among all nodes
+        for node in peers:
+            response = requests.get("{}syncVoterDatabase".format(node))
+            jsonData = response.json()
+            if jsonData["length"] != currentVoterDatabaseLength:
+                resp = requests.post(
+                    url="{}syncVoterDatabase".format(node),
+                    json={"voters": voterDb.getAllVotersInJson()},
+                    headers=POST_HEADERS,
+                )
+                if resp.status_code != 200:
+                    print("Unable to Sync VoterDb with Node:", node)
 
         # Admin Database
         # -----------------------------------------------------------------------------
 
-        print("Syncing Admin Database")
+        print("Getting Admin Database")
         largestAdminDatabase = None
         currentAdminDatabaseLength = adminDb.totalAdmins()
 
@@ -370,8 +391,13 @@ class Blockchain:
                 largestAdminDatabase = jsonData["admins"]
                 currentAdminDatabaseLength = jsonData["length"]
 
+        # If there is no largestVoterDatabase then we sync current database with all nodes
+        if largestAdminDatabase == None:
+            largestAdminDatabase = adminDb.getAllAdminsInJson()
+            currentAdminDatabaseLength = adminDb.totalAdmins()
+
         # If long adminDb avialable sync it for current node
-        if largestAdminDatabase:
+        if len(largestAdminDatabase) != adminDb.totalAdmins():
             for adminData in largestAdminDatabase:
                 newAdmin = Admin.fromJson(adminData)
                 admin = adminDb.getAdmin(newAdmin.loginId)
@@ -380,20 +406,20 @@ class Blockchain:
                 if admin == None:
                     adminDb.addAdmin(newAdmin)
 
-            currentAdminDatabaseLength = adminDb.totalAdmins()
-            print("Syncing AdminDb")
+        currentAdminDatabaseLength = adminDb.totalAdmins()
+        print("Syncing AdminDb")
 
-            # Sync largest AdminDb among all nodes
-            for node in peers:
-                response = requests.get("{}syncAdminDatabase".format(node))
-                jsonData = response.json()
-                if jsonData["length"] != currentAdminDatabaseLength:
-                    resp = requests.post(
-                        url="{}syncAdminDatabase".format(node),
-                        json={"admins": adminDb.getAllAdminsInJson()},
-                        headers=POST_HEADERS,
-                    )
-                    if resp.status_code != 200:
-                        print("Unable to Sync AdminDb with Node:", node)
+        # Sync largest AdminDb among all nodes
+        for node in peers:
+            response = requests.get("{}syncAdminDatabase".format(node))
+            jsonData = response.json()
+            if jsonData["length"] != currentAdminDatabaseLength:
+                resp = requests.post(
+                    url="{}syncAdminDatabase".format(node),
+                    json={"admins": adminDb.getAllAdminsInJson()},
+                    headers=POST_HEADERS,
+                )
+                if resp.status_code != 200:
+                    print("Unable to Sync AdminDb with Node:", node)
 
         return True

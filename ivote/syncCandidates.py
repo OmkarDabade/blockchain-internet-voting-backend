@@ -10,7 +10,6 @@ def syncCandidates():
     Node-to-Node API
     """
     print("/syncCandidates Called")
-    print("DATA RECIEVED:", request.data)
 
     try:
         if request.method == "GET":
@@ -24,6 +23,7 @@ def syncCandidates():
                 }
             )
         else:
+            print("DATA RECIEVED:", request.data)
             if request.is_json:
                 jsonData = request.get_json()
                 receivedCandidates = jsonData["candidates"]

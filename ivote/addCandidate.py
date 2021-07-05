@@ -1,3 +1,4 @@
+from blockchain import blockchain
 from database import adminRequired
 from ivote import iVoteApp
 from flask import request, jsonify
@@ -33,6 +34,8 @@ def addCandidate():
                     jsonData["ward"],
                 )
 
+                blockchain.consensus()
+                
                 return jsonify(
                     {
                         "result": True,

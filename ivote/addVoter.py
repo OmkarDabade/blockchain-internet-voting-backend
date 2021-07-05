@@ -1,3 +1,4 @@
+from blockchain import blockchain
 from database import adminRequired
 from database.voterModel import Voter
 from ivote import iVoteApp, voterDb
@@ -38,6 +39,7 @@ def addVoter():
                 added = voterDb.addVoter(voter)
                 if added:
                     print("adding done")
+                    blockchain.consensus()
                     return (
                         jsonify(
                             {

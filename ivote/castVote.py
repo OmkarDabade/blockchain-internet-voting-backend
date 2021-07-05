@@ -24,28 +24,28 @@ def castVote():
                 and "candidateName" in jsonData
                 and "voterId" in jsonData
             ):
-                voter = voterDb.getVoter(jsonData["voterId"])
+                # voter = voterDb.getVoter(jsonData["voterId"])
 
-                if voter == None:
-                    return jsonify(
-                        {
-                            "result": False,
-                            "message": "Voter not found",
-                            "api": "/castVote",
-                            "url": request.url,
-                        }
-                    )
+                # if voter == None:
+                #     return jsonify(
+                #         {
+                #             "result": False,
+                #             "message": "Voter not found",
+                #             "api": "/castVote",
+                #             "url": request.url,
+                #         }
+                #     )
 
-                if voter.isVoteCasted:
-                    return jsonify(
-                        {
-                            "result": True,
-                            "message": "Vote Already Casted",
-                            "voterId": sha1(jsonData["voterId"].encode()).hexdigest(),
-                            "api": "/castVote",
-                            "url": request.url,
-                        }
-                    )
+                # if voter.isVoteCasted:
+                #     return jsonify(
+                #         {
+                #             "result": True,
+                #             "message": "Vote Already Casted",
+                #             "voterId": sha1(jsonData["voterId"].encode()).hexdigest(),
+                #             "api": "/castVote",
+                #             "url": request.url,
+                #         }
+                #     )
 
                 blockchain.addBlock(
                     jsonData["candidateId"],  # CandidateId

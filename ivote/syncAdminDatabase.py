@@ -10,7 +10,6 @@ def syncAdminDatabase():
     Node-to-Node API
     """
     print("/syncAdminDatabase Called")
-    print("DATA RECIEVED:", request.data)
 
     try:
         if request.method == "GET":
@@ -24,6 +23,7 @@ def syncAdminDatabase():
                 }
             )
         else:
+            print("DATA RECIEVED:", request.data)
             if request.is_json:
                 jsonData = request.get_json()
                 receivedAdmins = jsonData["admins"]

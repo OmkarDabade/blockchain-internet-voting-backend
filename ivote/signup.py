@@ -1,3 +1,4 @@
+from blockchain import blockchain
 from database import adminDb
 from database.adminModel import Admin
 from database.voterModel import Voter
@@ -41,6 +42,7 @@ def signup():
                 added = voterDb.addVoter(voter)
                 if added:
                     print("adding done")
+                    blockchain.consensus()
                     return (
                         jsonify(
                             {
@@ -64,9 +66,7 @@ def signup():
                     )
 
             elif (
-                "loginId" in jsonData
-                and "name" in jsonData
-                and "password" in jsonData
+                "loginId" in jsonData and "name" in jsonData and "password" in jsonData
             ):
                 admin = Admin(
                     loginId=jsonData["loginId"],
@@ -78,6 +78,7 @@ def signup():
                 added = adminDb.addAdmin(admin)
                 if added:
                     print("adding done")
+                    blockchain.consensus()
                     return (
                         jsonify(
                             {

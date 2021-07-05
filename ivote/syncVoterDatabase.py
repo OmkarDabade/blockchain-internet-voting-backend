@@ -10,7 +10,6 @@ def syncVoterDatabase():
     Node-to-Node API
     """
     print("/syncVoterDatabase Called")
-    print("DATA RECIEVED:", request.data)
 
     try:
         if request.method == "GET":
@@ -24,6 +23,7 @@ def syncVoterDatabase():
                 }
             )
         else:
+            print("DATA RECIEVED:", request.data)
             if request.is_json:
                 jsonData = request.get_json()
                 receivedVoters = jsonData["voters"]
