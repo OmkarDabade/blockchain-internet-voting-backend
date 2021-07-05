@@ -4,7 +4,7 @@ from constants import peers
 from blockchain import blockchain, candidateList
 from database import voterDb, adminDb
 
-
+# API to get stats of all data
 @iVoteApp.route("/getDataStats", methods=["GET"])
 def getDataStats():
     """

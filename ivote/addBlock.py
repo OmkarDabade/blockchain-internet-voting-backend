@@ -3,7 +3,7 @@ from ivote import iVoteApp
 from flask import request, jsonify
 from blockchain import blockchain
 
-
+# API to add newly announced block to chain
 @iVoteApp.route("/addBlock", methods=["POST"])
 def addBlock():
     """

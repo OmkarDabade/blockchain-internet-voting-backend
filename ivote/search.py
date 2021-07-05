@@ -2,7 +2,7 @@ from ivote import iVoteApp
 from flask import request, jsonify
 from blockchain import blockchain
 
-
+# API to search for proof of vote casted
 @iVoteApp.route("/search", methods=["GET"])
 def search():
     """

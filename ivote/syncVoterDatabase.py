@@ -3,7 +3,7 @@ from ivote import iVoteApp
 from flask import request, jsonify
 from database import voterDb
 
-
+# API to sync Voter database
 @iVoteApp.route("/syncVoterDatabase", methods=["GET", "POST"])
 def syncVoterDatabase():
     """

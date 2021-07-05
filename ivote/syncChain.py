@@ -2,7 +2,7 @@ from ivote import iVoteApp
 from flask import request, jsonify
 from blockchain import blockchain
 
-
+# API to sync chain
 @iVoteApp.route("/syncChain", methods=["GET", "POST"])
 def syncChain():
     """

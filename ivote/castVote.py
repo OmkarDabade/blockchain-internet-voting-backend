@@ -5,7 +5,7 @@ from blockchain import blockchain
 from flask_jwt_extended import jwt_required
 from database import voterDb
 
-
+# API to cast vote
 @iVoteApp.route("/castVote", methods=["POST"])
 # @jwt_required()
 def castVote():

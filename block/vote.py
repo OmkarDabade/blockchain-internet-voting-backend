@@ -47,7 +47,6 @@ class Vote:
             self.nonce += 1
             computedHash = self.computeHash()
         self.blockHash = computedHash
-        # return blockHash
 
     def __str__(self):
         return "\nBlock#: %s\nCandidate Id: %s\nCandidate Name: %s\nFrom Voter: %s\nTime: %s\nNonce: %s\nBlock Hash: %s\nPrevious Hash: %s" % (

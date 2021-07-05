@@ -2,7 +2,7 @@ from ivote import iVoteApp
 from flask import request, jsonify
 from constants import peers
 
-
+# API to sync Peers
 @iVoteApp.route("/syncPeers", methods=["GET", "POST"])
 def syncPeers():
     """

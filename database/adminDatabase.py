@@ -2,11 +2,13 @@ from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.exc import IntegrityError
 
 # from werkzeug.security import generate_password_hash
-
 # from database import Voter
 
 
 class AdminDatabase:
+    """
+    Class to manage admin database
+    """
     def __init__(self) -> None:
         self.database = SQLAlchemy()
         # self.database.init_app(app)

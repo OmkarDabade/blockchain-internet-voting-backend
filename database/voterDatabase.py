@@ -5,6 +5,10 @@ from sqlalchemy.exc import IntegrityError
 
 
 class VoterDatabase:
+    """
+    Class to manage admin database
+    """
+
     def __init__(self) -> None:
         self.database = SQLAlchemy()
         # self.database.init_app(app)

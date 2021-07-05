@@ -3,7 +3,7 @@ from ivote import iVoteApp
 from flask import request, jsonify
 from blockchain import candidateList
 
-
+# API to get list of candidates to whom vote will be casted 
 @iVoteApp.route("/getCandidates", methods=["GET"])
 # @jwt_required()
 def getCandidates():

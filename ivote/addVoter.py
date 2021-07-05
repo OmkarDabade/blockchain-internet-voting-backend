@@ -3,11 +3,9 @@ from database import adminRequired
 from database.voterModel import Voter
 from ivote import iVoteApp, voterDb
 from flask import request, jsonify
-
-# from werkzeug.security import generate_password_hash
 from sqlalchemy.exc import IntegrityError
 
-
+# API to add new voter to database
 @iVoteApp.route("/addVoter", methods=["POST"])
 # @adminRequired(api="/addVoter")
 def addVoter():

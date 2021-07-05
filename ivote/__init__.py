@@ -6,7 +6,6 @@ from flask import Flask
 from flask_jwt_extended import JWTManager
 from constants import ROLE_ADMIN, ROLE_VOTER
 
-
 iVoteApp = Flask(__name__)
 # Setup the Flask-JWT-Extended extension
 iVoteApp.config["JWT_SECRET_KEY"] = "This-Is-My-Super-Duper-Secret-Key-875"
@@ -19,14 +18,8 @@ iVoteApp.config["SQLALCHEMY_BINDS"] = {
 }
 iVoteApp.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
-# creates SQLALCHEMY object
-# voterDb = SQLAlchemy(app=iVoteApp)
-
 voterDb.database.init_app(iVoteApp)
 adminDb.database.init_app(iVoteApp)
-
-# voterDb = SQLAlchemy()
-# voterDb.init_app(iVoteApp)
 
 jwt = JWTManager(iVoteApp)
 
@@ -49,8 +42,6 @@ from .search import search
 from .signup import signup
 
 from .syncAdminDatabase import syncAdminDatabase
-
-# from .syncAllData import syncAllData
 from .syncCandidates import syncCandidates
 
 from .syncChain import syncChain
@@ -91,19 +82,3 @@ def admins():
             "api": "/admins",
         }
     )
-
-
-# @jwt.additional_claims_loader
-# def add_claims_to_access_token(identity):
-#     print("IDENTITY:", identity)
-#     return {
-#         "role": ROLEADMIN,
-#         "loginId": identity.loginId,
-#         "name": identity.name,
-#     }
-
-# {
-#     "aud": "some_audience",
-#     "foo": "bar",
-#     "upcase_name": identity.upper(),
-# }

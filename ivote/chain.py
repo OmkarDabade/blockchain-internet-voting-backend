@@ -3,7 +3,7 @@ from ivote import iVoteApp
 from flask import jsonify, request
 from constants import peers
 
-
+# API to get chain data
 @iVoteApp.route("/chain", methods=["GET"])
 def chain():
     """
@@ -11,9 +11,6 @@ def chain():
     Authority-to-Node API
     """
     print("/chain Called")
-    # chain = []
-    # for block in blockchain.chain:
-    #     chain.append(block.toJson())
 
     return jsonify(
         {

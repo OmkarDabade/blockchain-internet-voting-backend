@@ -6,7 +6,7 @@ from ivote import iVoteApp, voterDb
 from flask import request, jsonify
 from werkzeug.security import generate_password_hash
 
-
+# API to register in system(for voter as well as admin)
 @iVoteApp.route("/signup", methods=["POST"])
 def signup():
     """
@@ -120,27 +120,6 @@ def signup():
                     "url": request.url,
                 }
             )
-
-    # except IntegrityError:
-    #     voterDb.session.rollback()
-    #     return jsonify(
-    #         {
-    #             "result": False,
-    #             "error": "Voter Db Rollback\nUser already exists",
-    #             "api": "/signup",
-    #             "url": request.url,
-    #         }
-    #     )
-    # except AttributeError:
-    #     return jsonify(
-    #         {
-    #             "result": False,
-    #             "error": "Provide data in json format",
-    #             "api": "/signup",
-    #             "url": request.url,
-    #         }
-    #     )
-
     except:
         return jsonify(
             {

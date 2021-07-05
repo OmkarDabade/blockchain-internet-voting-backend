@@ -23,7 +23,7 @@ class Blockchain:
 
     def addBlock(self, candidateId: int, candidateName: str, voterId: str):
         """
-        A function that adds the block to the chain.
+        A function that adds the vote data to the chain.
         """
         print("Adding Block to chain")
 
@@ -32,7 +32,6 @@ class Blockchain:
                 0,
                 candidateId,
                 candidateName,
-                # voterId,
                 sha1(voterId.encode()).hexdigest(),
                 datetime.now(),
                 GENESIS_BLOCKHASH,
@@ -45,7 +44,6 @@ class Blockchain:
                 self.previousIndex + 1,
                 candidateId,
                 candidateName,
-                # voterId,
                 sha1(voterId.encode()).hexdigest(),
                 datetime.now(),
                 self.previousHash,
@@ -66,7 +64,6 @@ class Blockchain:
         """
         print("Accept New Anounced Block")
 
-        # if len(self.chain) == 0:
         print("Previous     HASH:", self.previousHash)
         print("Recived BlockHASH:", block.previousBlockHash)
 
@@ -78,18 +75,6 @@ class Blockchain:
             print("is not valid proof")
             return False
 
-        # else:
-        #     print("Previous     HASH:", self.previousHash)
-        #     print("Recived BlockHASH:", block.previousBlockHash)
-
-        #     if self.previousHash != block.previousBlockHash:
-        #         print("Hash doesnt match")
-        #         return False
-
-        #     if not self.isValidProof(block, block.blockHash):
-        #         print("is not valid proof")
-        #         return False
-
         print("Block added to chain")
         self.chain.append(block)
         self.previousIndex += 1
@@ -99,8 +84,7 @@ class Blockchain:
     @classmethod
     def isValidProof(cls, block: Vote, blockHash: str):
         """
-        Check if blockHash is valid hash of block and satisfies
-        the difficulty criteria.
+        Check if blockHash is valid hash of block and satisfies the difficulty criteria.
         """
         return (
             blockHash.startswith("0" * BLOCKCHAIN_DIFFICULTY)
@@ -109,6 +93,10 @@ class Blockchain:
 
     @classmethod
     def isChainValid(cls, chainDump: dict):
+        """
+        Check if chain satisfies validity criteria ie block should give given hash and that
+        hash should be linked to previous block
+        """
         result = True
         previousHash = GENESIS_BLOCKHASH
 
@@ -126,6 +114,9 @@ class Blockchain:
         return result
 
     def syncChain(self, chainDump: dict):
+        """
+        Completely replace current chain with new valid chain
+        """
         res = self.isChainValid(chainDump)
         if res:
             newChain: list[Vote] = []
@@ -157,35 +148,25 @@ class Blockchain:
 
         for peer in peers:
             url = "{}addBlock".format(peer)
-            # headers = {"Content-Type": "application/json"}
-            print(url)
-            # try:
+
             res = requests.post(url=url, json=block.toJson(), headers=POST_HEADERS)
             print("Peer: ", peer)
-            print("API Response ", res.text)
-            if res.status_code == 200:
-                jsonData = res.json()
-                print("Result: ", jsonData["result"])
-
-                # if jsonData["result"] == True:
-                #     print("res is True")
-                #     if jsonData["data"]["Length"] != len(self.chain):
-                #         self.consensus()
-            # except:
-            #     print("Some error occured during annoucing block")
+            print("API Response: ", res.text)
 
     def getChainInJson(self):
+        """
+        Get chain in JSON format
+        """
         chain = []
         for vote in self.chain:
-            # vote.voterId = sha1(vote.voterId.encode()).hexdigest()
             chain.append(vote.toJson())
 
         return chain
 
     def consensus(self):
         """
-        Our naive consensus algorithm. If a longer valid chain is
-        found, our chain is replaced with it.
+        Consensus Algorithm:
+        If a longer valid chain is found, our chain is replaced with it.
         """
         print("Consensous called")
 
@@ -215,7 +196,7 @@ class Blockchain:
             longestPeerList = list(peers)
             currentPeerLength = len(peers)
 
-        # If long peer list avialable sync it with current node
+        # If longer peer list than current peer list is avialable sync it with current node
         if len(longestPeerList) != len(peers):
             for peer in longestPeerList:
                 if request.host_url != peer:
@@ -263,13 +244,12 @@ class Blockchain:
             currentChainLength = len(self.chain)
 
         # If longest valid chain avialable sync it with current node
-
         if len(longestValidChainDump) != len(self.chain):
             self.syncChain(longestValidChainDump)
 
         # longestPeerList = None
         currentChainLength = len(self.chain)
-        print("Syncing chain with current node")
+        print("Syncing chain with other nodes")
 
         # Sync longest valid chain among all nodes
         for node in peers:
@@ -315,7 +295,7 @@ class Blockchain:
                     candidateList.append(candidate)
 
         currentCandidateDataLength = len(candidateList)
-        print("Syncing Candidates")
+        print("Syncing Candidates with other nodes")
 
         # Sync longest candidate list among all nodes
         for node in peers:
@@ -361,7 +341,7 @@ class Blockchain:
                     voterDb.addVoter(newVoter)
 
         currentVoterDatabaseLength = voterDb.totalVoters()
-        print("Syncing VoterDb")
+        print("Syncing Voter Database with other nodes")
 
         # Sync largest voterDb among all nodes
         for node in peers:
@@ -407,7 +387,7 @@ class Blockchain:
                     adminDb.addAdmin(newAdmin)
 
         currentAdminDatabaseLength = adminDb.totalAdmins()
-        print("Syncing AdminDb")
+        print("Syncing Admin Database with other nodes")
 
         # Sync largest AdminDb among all nodes
         for node in peers:

@@ -4,7 +4,7 @@ from blockchain import blockchain, candidateList
 from database import voterDb, adminDb
 from constants import peers
 
-
+# API to perform consensus
 @iVoteApp.route("/consensus", methods=["POST"])
 def consensus():
     """
@@ -14,18 +14,28 @@ def consensus():
     print("/consensus Called")
     print("DATA RECIEVED:", request.data)
 
-    blockchain.consensus()
+    res = blockchain.consensus()
 
-    return jsonify(
-        {
-            "result": True,
-            "message": "Consensus Performed",
-            "api": "/consensus",
-            "chain": len(blockchain.chain),
-            "candidates": len(candidateList),
-            "peers": len(peers),
-            "voters": voterDb.totalVoters(),
-            "admins": adminDb.totalAdmins(),
-            "url": request.url,
-        }
-    )
+    if res:
+        return jsonify(
+            {
+                "result": True,
+                "message": "Consensus Performed",
+                "api": "/consensus",
+                "chain": len(blockchain.chain),
+                "candidates": len(candidateList),
+                "peers": len(peers),
+                "voters": voterDb.totalVoters(),
+                "admins": adminDb.totalAdmins(),
+                "url": request.url,
+            }
+        )
+    else:
+        return jsonify(
+            {
+                "result": False,
+                "message": "Performing Consensus failed",
+                "api": "/consensus",
+                "url": request.url,
+            }
+        )

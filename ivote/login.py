@@ -5,7 +5,7 @@ from database import voterDb, adminDb
 from flask import request, jsonify
 from werkzeug.security import check_password_hash
 
-
+# API to login into system(for admin as well as voter)
 @iVoteApp.route("/login", methods=["GET", "POST"])
 def login():
     """
