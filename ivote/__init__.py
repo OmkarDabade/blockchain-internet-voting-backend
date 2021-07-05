@@ -49,7 +49,8 @@ from .search import search
 from .signup import signup
 
 from .syncAdminDatabase import syncAdminDatabase
-from .syncAllData import syncAllData
+
+# from .syncAllData import syncAllData
 from .syncCandidates import syncCandidates
 
 from .syncChain import syncChain

@@ -29,43 +29,54 @@ def registerFromNewNode():
                 }
             )
 
-        chain = blockchain.getChainInJson()
-        admins = adminDb.getAllAdminsInJson()
-        voters = voterDb.getAllVotersInJson()
-        candidateListInJson = candidates.getAllCandidatesInJson()
+        # chain = blockchain.getChainInJson()
+        # admins = adminDb.getAllAdminsInJson()
+        # voters = voterDb.getAllVotersInJson()
+        # candidateListInJson = candidates.getAllCandidatesInJson()
 
-        newPeers: list = list(peers)
-        newPeers.append(request.host_url)
+        # newPeers: list = list(peers)
+        # newPeers.append(request.host_url)
 
-        jsonData = {
-            "result": True,
-            "chain": chain,
-            "peers": newPeers,
-            "candidates": candidateListInJson,
-            "voters": voters,
-            "admins": admins,
-        }
-        # header = {"Content-Type": "application/json"}
+        # jsonData = {
+        #     "result": True,
+        #     "chain": chain,
+        #     "peers": newPeers,
+        #     "candidates": candidateListInJson,
+        #     "voters": voters,
+        #     "admins": admins,
+        # }
+        # # header = {"Content-Type": "application/json"}
 
-        # Add the node to the peer list
-        peers.add(str(newNodeAddress))
+        # # Add the node to the peer list
+        # peers.add(str(newNodeAddress))
 
-        # Make a request to register with remote node and send information
-        res = requests.post(
-            url="{}syncAllData".format(newNodeAddress),
-            json=jsonData,
-            headers=POST_HEADERS,
-        )
-        print("Result After Making Post req /syncAllData:", res.text)
+        # # Make a request to register with remote node and send information
+        # res = requests.post(
+        #     url="{}syncAllData".format(newNodeAddress),
+        #     json=jsonData,
+        #     headers=POST_HEADERS,
+        # )
+        # print("Result After Making Post req /syncAllData:", res.text)
 
-        return jsonify(
-            {
-                "result": True,
-                "message": "Registration Successful and Data Synced",
-                "api": "/registerFromNewNode",
-                "url": request.url,
-            }
-        )
+        res = blockchain.consensus()
+        if res:
+            return jsonify(
+                {
+                    "result": True,
+                    "message": "Registration Successful and Data Synced",
+                    "api": "/registerFromNewNode",
+                    "url": request.url,
+                }
+            )
+        else:
+            return jsonify(
+                {
+                    "result": False,
+                    "message": "Data Sync Failed",
+                    "api": "/registerFromNewNode",
+                    "url": request.url,
+                }
+            )
 
     else:
         return jsonify(

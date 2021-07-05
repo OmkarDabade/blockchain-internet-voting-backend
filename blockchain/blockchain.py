@@ -23,7 +23,7 @@ class Blockchain:
 
     def addBlock(self, candidateId: int, candidateName: str, voterId: str):
         """
-        A function that adds the block to the chain after verification.
+        A function that adds the block to the chain.
         """
         print("Adding Block to chain")
 
@@ -108,7 +108,7 @@ class Blockchain:
         )
 
     @classmethod
-    def checkChainValidity(cls, chainDump: dict):
+    def isChainValid(cls, chainDump: dict):
         result = True
         previousHash = GENESIS_BLOCKHASH
 
@@ -126,27 +126,16 @@ class Blockchain:
         return result
 
     def syncChain(self, chainDump: dict):
-        # previousHash = GENESIS_BLOCKHASH
-        # for blockData in chainDump:
-        #     block = Vote.fromJson(blockData)
-
-        #     if (
-        #         not self.isValidProof(block, block.blockHash)
-        #         or previousHash != block.previousBlockHash
-        #     ):
-        #         return False
-
-        #     previousHash = block.blockHash
-
-        res = self.checkChainValidity(chainDump)
+        res = self.isChainValid(chainDump)
         if res:
             newChain: list[Vote] = []
 
             for voteData in chainDump:
                 vote = Vote.fromJson(voteData)
                 newChain.append(vote)
+
             self.chain = newChain
-            print("successfully synced the chain")
+            print("Successfully synced the chain")
         else:
             print("Chain is tampered unable to sync")
 
@@ -216,7 +205,7 @@ class Blockchain:
         for node in peers:
             response = requests.get("{}syncPeers".format(node))
             jsonData = response.json()
-            if jsonData["length"] != currentPeerLength:
+            if jsonData["length"] > currentPeerLength:
                 longestPeerList = jsonData["peers"]
                 currentPeerLength = jsonData["length"]
 
@@ -225,6 +214,9 @@ class Blockchain:
             for peer in longestPeerList:
                 if request.host_url != peer:
                     peers.add(str(peer))
+
+            newPeers: list = list(peers)
+            newPeers.append(request.host_url)
 
             # longestPeerList = None
             currentPeerLength = len(peers)
@@ -237,7 +229,7 @@ class Blockchain:
                 if jsonData["length"] != currentPeerLength:
                     resp = requests.post(
                         url="{}syncPeers".format(node),
-                        json={"peers": list(peers)},
+                        json={"peers": newPeers},
                         headers=POST_HEADERS,
                     )
                     if resp.status_code != 200:
@@ -254,7 +246,7 @@ class Blockchain:
         for node in peers:
             response = requests.get("{}syncChain".format(node))
             jsonData = response.json()
-            if jsonData["length"] != currentChainLength and self.checkChainValidity(
+            if jsonData["length"] > currentChainLength and self.isChainValid(
                 jsonData["chain"]
             ):
                 longestValidChainDump = jsonData["chain"]
@@ -266,15 +258,14 @@ class Blockchain:
 
             # longestPeerList = None
             currentChainLength = len(self.chain)
-            print("Syncing Chain")
+            print("Syncing chain with current node")
 
             # Sync longest valid chain among all nodes
             for node in peers:
                 response = requests.get("{}syncChain".format(node))
                 jsonData = response.json()
-                if jsonData[
-                    "length"
-                ] != currentChainLength or not self.checkChainValidity(
+
+                if jsonData["length"] != currentChainLength or not self.isChainValid(
                     jsonData["chain"]
                 ):
                     resp = requests.post(
@@ -296,7 +287,7 @@ class Blockchain:
         for node in peers:
             response = requests.get("{}syncCandidates".format(node))
             jsonData = response.json()
-            if jsonData["length"] != currentCandidateDataLength:
+            if jsonData["length"] > currentCandidateDataLength:
                 longestCandidateData = jsonData["candidates"]
                 currentCandidateDataLength = jsonData["length"]
 
@@ -334,7 +325,7 @@ class Blockchain:
         for node in peers:
             response = requests.get("{}syncVoterDatabase".format(node))
             jsonData = response.json()
-            if jsonData["length"] != currentVoterDatabaseLength:
+            if jsonData["length"] > currentVoterDatabaseLength:
                 largestVoterDatabase = jsonData["voters"]
                 currentVoterDatabaseLength = jsonData["length"]
 
@@ -375,7 +366,7 @@ class Blockchain:
         for node in peers:
             response = requests.get("{}syncAdminDatabase".format(node))
             jsonData = response.json()
-            if jsonData["length"] != currentAdminDatabaseLength:
+            if jsonData["length"] > currentAdminDatabaseLength:
                 largestAdminDatabase = jsonData["admins"]
                 currentAdminDatabaseLength = jsonData["length"]
 

@@ -27,17 +27,6 @@ def addBlock():
                 and "previousHash" in jsonData
             ):
                 newBlock = Vote.fromJson(jsonData)
-                # (
-                #     jsonData["block#"],
-                #     jsonData["candidateId"],
-                #     jsonData["candidateName"],
-                #     jsonData["fromVoter"],
-                #     datetime.fromisoformat(jsonData["time"]),
-                #     jsonData["previousHash"],
-                #     blockHash=jsonData["blockHash"],
-                #     nonce=jsonData["nonce"],
-                # )
-
                 res = blockchain.acceptNewAnnouncedBlock(newBlock)
 
                 if res:
