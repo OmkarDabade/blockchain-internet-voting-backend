@@ -11,7 +11,6 @@ def signup():
     """
     Client-to-Authority API
     """
-
     print("/signup Called")
     print("DATA RECIEVED:", request.data)
 
@@ -47,7 +46,7 @@ def signup():
                             {
                                 "result": True,
                                 "api": "/signup",
-                                "result": "Successful Voter Registration",
+                                "message": "Successful Voter Registration",
                                 "url": request.url,
                             }
                         ),
@@ -59,7 +58,7 @@ def signup():
                         {
                             "result": False,
                             "api": "/signup",
-                            "error": "Voter Registration Failed in Database",
+                            "message": "Voter Registration Failed in Database",
                             "url": request.url,
                         }
                     )
@@ -84,7 +83,7 @@ def signup():
                             {
                                 "result": True,
                                 "api": "/signup",
-                                "result": "Successful Admin Registration",
+                                "message": "Successful Admin Registration",
                                 "url": request.url,
                             }
                         ),
@@ -96,7 +95,7 @@ def signup():
                         {
                             "result": False,
                             "api": "/signup",
-                            "error": "Admin Registration Failed in Database",
+                            "message": "Admin Registration Failed in Database",
                             "url": request.url,
                         }
                     )
@@ -105,7 +104,7 @@ def signup():
                 return jsonify(
                     {
                         "result": False,
-                        "error": "Incomplete Data",
+                        "message": "Incomplete Data",
                         "api": "/signup",
                         "url": request.url,
                     }
@@ -115,7 +114,7 @@ def signup():
             return jsonify(
                 {
                     "result": False,
-                    "error": "Invalid JSON Format",
+                    "message": "Invalid JSON Format",
                     "api": "/signup",
                     "url": request.url,
                 }
@@ -145,7 +144,7 @@ def signup():
         return jsonify(
             {
                 "result": False,
-                "error": "Some error occured",
+                "message": "Some error occured",
                 "api": "/signup",
                 "url": request.url,
             }

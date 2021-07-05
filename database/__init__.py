@@ -1,4 +1,4 @@
-from constants import ROLEADMIN
+from constants import *
 from functools import wraps
 from .voterDatabase import VoterDatabase
 from .adminDatabase import AdminDatabase
@@ -12,7 +12,7 @@ adminDb = AdminDatabase()
 from .voterModel import Voter
 from .adminModel import Admin
 
-# Here is a custom decorator that verifies the JWT is present in the request,
+# Custom decorator that verifies the JWT is present in the request,
 # as well as insuring that the JWT has a claim indicating that this user is
 # an administrator
 def adminRequired(api: str = ""):
@@ -21,9 +21,9 @@ def adminRequired(api: str = ""):
         def decorator(*args, **kwargs):
             verify_jwt_in_request()
             claim = get_jwt()
-            print("CLAIMS:", claim)
+            print("CLAIM:", claim)
 
-            if claim["role"] == ROLEADMIN:
+            if claim["role"] == ROLE_ADMIN:
                 return fn(*args, **kwargs)
             else:
                 return (

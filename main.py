@@ -9,7 +9,7 @@ if __name__ == "__main__":
         blockchain.addBlock(
             100 + i,
             f"Candidate Name %s" % (i + 1),
-            "ghjdskgvwaeioygubwjkcn37o28f732gfui3fbu738oyf7",
+            f"Voter Id %s" % (i + 1),
         )
 
     for vote in blockchain.chain:

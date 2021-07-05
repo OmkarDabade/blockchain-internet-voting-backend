@@ -1,4 +1,4 @@
-from constants import ROLEADMIN, ROLEVOTER
+from constants import ROLE_ADMIN, ROLE_VOTER
 from flask_jwt_extended.utils import create_access_token
 from ivote import iVoteApp
 from database import voterDb, adminDb
@@ -11,7 +11,6 @@ def login():
     """
     Client-to-Node API
     """
-
     print("/GET login Called")
     print("DATA RECIEVED:", request.data)
 
@@ -21,17 +20,15 @@ def login():
 
             if "voterId" in jsonData and "password" in jsonData:
                 print("Voter Data is Here")
-
-                # user = Voter.query.filter_by(voterId=jsonData["voterId"]).first()
                 voter = voterDb.getVoter(jsonData["voterId"])
 
-                if not voter:
+                if voter == None:
                     return (
                         jsonify(
                             {
                                 "result": False,
                                 "api": "/login",
-                                "error": "User not found",
+                                "message": "Voter not found",
                                 "url": request.url,
                             }
                         ),
@@ -39,19 +36,21 @@ def login():
                     )
 
                 if check_password_hash(voter.passwordHash, jsonData["password"]):
-                    add_claims = {
-                        "role": ROLEVOTER,
+                    claims = {
+                        "role": ROLE_VOTER,
                         "id": voter.voterId,
                         "name": voter.name,
                     }
-                    access_token = create_access_token(
-                        identity=jsonData["voterId"], additional_claims=add_claims
+                    accessToken = create_access_token(
+                        identity=voter.voterId, additional_claims=claims
                     )
                     return jsonify(
                         {
                             "result": True,
                             "api": "/login",
-                            "token": access_token,
+                            "message": "Successful Login",
+                            "isVoteCasted": voter.isVoteCasted,
+                            "token": accessToken,
                             "url": request.url,
                         }
                     )
@@ -60,24 +59,21 @@ def login():
                         {
                             "result": False,
                             "api": "/login",
-                            "error": "Wrong Password",
+                            "message": "Wrong Password",
                             "url": request.url,
                         }
                     )
             elif "loginId" in jsonData and "password" in jsonData:
                 print("Admin Data is Here")
-
-                # user = Voter.query.filter_by(voterId=jsonData["voterId"]).first()
                 admin = adminDb.getAdmin(jsonData["loginId"])
-                print(admin)
 
-                if not admin:
+                if admin == None:
                     return (
                         jsonify(
                             {
                                 "result": False,
                                 "api": "/login",
-                                "error": "Admin not found",
+                                "message": "Admin not found",
                                 "url": request.url,
                             }
                         ),
@@ -85,21 +81,22 @@ def login():
                     )
 
                 if check_password_hash(admin.passwordHash, jsonData["password"]):
-                    print("pass matched")
-                    add_claims = {
-                        "role": ROLEADMIN,
+                    print("admin pass matched")
+                    claims = {
+                        "role": ROLE_ADMIN,
                         "id": admin.loginId,
                         "name": admin.name,
                     }
-                    access_token = create_access_token(
-                        identity=admin.loginId, additional_claims=add_claims
+                    accessToken = create_access_token(
+                        identity=admin.loginId, additional_claims=claims
                     )
-                    print("access token")
+                    # print("access token")
                     return jsonify(
                         {
                             "result": True,
                             "api": "/login",
-                            "token": access_token,
+                            "message": "Successful Login",
+                            "token": accessToken,
                             "url": request.url,
                         }
                     )
@@ -108,7 +105,7 @@ def login():
                         {
                             "result": False,
                             "api": "/login",
-                            "error": "Wrong Password",
+                            "message": "Wrong Password",
                             "url": request.url,
                         }
                     )
@@ -117,7 +114,7 @@ def login():
                 return jsonify(
                     {
                         "result": False,
-                        "error": "Incomplete Data",
+                        "message": "Incomplete Data",
                         "api": "/login",
                         "url": request.url,
                     }
@@ -127,7 +124,7 @@ def login():
             return jsonify(
                 {
                     "result": False,
-                    "error": "Invalid JSON Format",
+                    "message": "Invalid JSON Format",
                     "api": "/login",
                     "url": request.url,
                 }
@@ -136,66 +133,8 @@ def login():
         return jsonify(
             {
                 "result": False,
-                "error": "Some error occured",
+                "message": "Some error occured",
                 "api": "/login",
                 "url": request.url,
             }
         )
-
-
-# @iVoteApp.route("/login", methods=["POST"])
-# def login():
-#     print("/POST login Called")
-#     try:
-#         if request.is_json:
-#             jsonData = request.get_json()
-#             print("JSON DATA RECIEVED:", jsonData)
-
-#             if "login" in jsonData and "password" in jsonData:
-#                 print("Data Here")
-
-#                 username = request.json.get("login", None)
-#                 password = request.json.get("password", None)
-
-#                 if username != "test" or password != "test":
-#                     return jsonify({"msg": "Bad username or password"}), 401
-
-#                 access_token = create_access_token(identity=username)
-
-#                 return jsonify(
-#                     {
-#                         "result": True,
-#                         "api": "/login",
-#                         "token": access_token,
-#                         "url": request.url,
-#                     }
-#                 )
-
-#             else:
-#                 return jsonify(
-#                     {
-#                         "result": False,
-#                         "error": "Incomplete Data",
-#                         "api": "/login",
-#                         "url": request.url,
-#                     }
-#                 )
-
-#         else:
-#             return jsonify(
-#                 {
-#                     "result": False,
-#                     "error": "Invalid JSON Format",
-#                     "api": "/login",
-#                     "url": request.url,
-#                 }
-#             )
-#     except:
-#         return jsonify(
-#             {
-#                 "result": False,
-#                 "error": "Some error occured",
-#                 "api": "/login",
-#                 "url": request.url,
-#             }
-#         )

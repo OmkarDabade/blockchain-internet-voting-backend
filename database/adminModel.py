@@ -1,4 +1,4 @@
-from constants import ROLEADMIN
+from constants import *
 from database import adminDb
 from sqlalchemy import Column, String, Integer
 
@@ -6,9 +6,8 @@ from sqlalchemy import Column, String, Integer
 # Database ORMs
 class Admin(adminDb.database.Model):
 
-    __tablename__ = 'admins'
-    __bind_key__  = ROLEADMIN
-
+    __tablename__ = "admins"
+    __bind_key__ = ROLE_ADMIN
 
     id = Column("Id", Integer, autoincrement=True, primary_key=True)
     loginId = Column("Login Id", String(20), unique=True)
@@ -28,3 +27,11 @@ class Admin(adminDb.database.Model):
             "loginId": self.loginId,
             "passwordHash": self.passwordHash,
         }
+
+    @staticmethod
+    def fromJson(jsonData: dict):
+        return Admin(
+            name=jsonData["name"],
+            loginId=jsonData["loginId"],
+            passwordHash=jsonData["passwordHash"],
+        )

@@ -1,72 +1,77 @@
-from ivote import iVoteApp, get_chain
+from ivote import iVoteApp
 from flask import request, jsonify
 import requests
-from constants import peers
+from constants import peers, POST_HEADERS
+from blockchain import blockchain, candidates
+from database import adminDb, voterDb
 
 
-# endpoint to add new peers to the network.
 @iVoteApp.route("/registerFromNewNode", methods=["POST"])
 def registerFromNewNode():
     """
     Node-to-Node API
     """
-
     print("/registerFromNewNode Called")
     print("DATA RECIEVED:", request.data)
 
     # try:
     if request.is_json:
         jsonData = request.get_json()
-
         newNodeAddress = jsonData["newNodeAddress"]
 
-        if not newNodeAddress:
+        if newNodeAddress == None:
             return jsonify(
                 {
                     "result": False,
-                    "error": "Node Address not avialable in request",
+                    "message": "Node Address not avialable in request",
                     "api": "/registerFromNewNode",
                     "url": request.url,
                 }
             )
 
+        chain = blockchain.getChainInJson()
+        admins = adminDb.getAllAdminsInJson()
+        voters = voterDb.getAllVotersInJson()
+        candidateListInJson = candidates.getAllCandidatesInJson()
+
+        newPeers: list = list(peers)
+        newPeers.append(request.host_url)
+
+        jsonData = {
+            "result": True,
+            "chain": chain,
+            "peers": newPeers,
+            "candidates": candidateListInJson,
+            "voters": voters,
+            "admins": admins,
+        }
+        # header = {"Content-Type": "application/json"}
+
         # Add the node to the peer list
         peers.add(str(newNodeAddress))
 
-        chainData = get_chain()
-        print(chainData)
-        header = {"Content-Type": "application/json"}
-
         # Make a request to register with remote node and send information
         res = requests.post(
-            url=str(newNodeAddress) + "/createChainFromDump",
-            json=chainData,
-            headers=header,
+            url="{}syncAllData".format(newNodeAddress),
+            json=jsonData,
+            headers=POST_HEADERS,
         )
-
-        print(
-            "Result After Making Post request create_chain_from_dump:",
-            res.text,
-        )
+        print("Result After Making Post req /syncAllData:", res.text)
 
         return jsonify(
             {
                 "result": True,
-                "data": "Registration Successful",
+                "message": "Registration Successful and Data Synced",
                 "api": "/registerFromNewNode",
                 "url": request.url,
             }
         )
-        # if response.json()["result"] == "True":
-        #     return jsonify({"result": True, "data": "Registration Successful"})
-        # else:
-        #     return jsonify({"result": False, "error": "unknown Error Occured"})
 
     else:
         return jsonify(
             {
                 "result": False,
-                "error": "Invalid JSON Format",
+                "message": "Invalid JSON Format",
                 "api": "/registerFromNewNode",
                 "url": request.url,
             }

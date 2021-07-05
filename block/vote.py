@@ -9,7 +9,7 @@ class Vote:
         index: int,
         candidateId: int,
         candidateName: str,
-        fromVoter: str,
+        voterIdHash: str,
         timestamp: datetime,
         previousHash: str,
         blockHash: str = None,
@@ -18,7 +18,7 @@ class Vote:
         self.index = index
         self.candidateId = candidateId
         self.candidateName = candidateName
-        self.fromVoter = fromVoter
+        self.voterIdHash = voterIdHash
         self.timestamp = timestamp
         self.previousBlockHash = previousHash
         if blockHash is not None:
@@ -33,7 +33,7 @@ class Vote:
             str(self.index)
             + str(self.candidateId)
             + str(self.candidateName)
-            + str(self.fromVoter)
+            + str(self.voterIdHash)
             + str(self.timestamp)
             + str(self.nonce)
             + str(self.previousBlockHash)
@@ -43,7 +43,7 @@ class Vote:
     def computeProofOfWork(self):
         self.nonce = 0
         computedHash = self.computeHash()
-        while not computedHash.startswith("0" * blockchainDifficulty):
+        while not computedHash.startswith("0" * BLOCKCHAIN_DIFFICULTY):
             self.nonce += 1
             computedHash = self.computeHash()
         self.blockHash = computedHash
@@ -54,7 +54,7 @@ class Vote:
             self.index,
             self.candidateId,
             self.candidateName,
-            self.fromVoter,
+            self.voterIdHash,
             self.timestamp,
             self.nonce,
             self.blockHash,
@@ -66,9 +66,22 @@ class Vote:
             "block#": self.index,
             "candidateId": self.candidateId,
             "candidateName": self.candidateName,
-            "fromVoter": self.fromVoter,
+            "fromVoter": self.voterIdHash,
             "time": self.timestamp.isoformat(),
             "nonce": self.nonce,
             "blockHash": self.blockHash,
             "previousHash": self.previousBlockHash,
         }
+
+    @staticmethod
+    def fromJson(jsonData: dict):
+        return Vote(
+            jsonData["block#"],
+            jsonData["candidateId"],
+            jsonData["candidateName"],
+            jsonData["fromVoter"],
+            datetime.fromisoformat(jsonData["time"]),
+            jsonData["previousHash"],
+            blockHash=jsonData["blockHash"],
+            nonce=jsonData["nonce"],
+        )

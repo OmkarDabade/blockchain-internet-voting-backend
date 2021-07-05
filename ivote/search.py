@@ -8,7 +8,6 @@ def search():
     """
     Client-to-Node API
     """
-
     print("/search Called")
     print("DATA RECIEVED:", request.data)
 
@@ -18,13 +17,13 @@ def search():
 
             if "blockHash" in jsonData:
                 for vote in blockchain.chain:
-                    print(vote.blockHash)
                     if vote.blockHash == jsonData["blockHash"]:
+                        print(vote.blockHash)
                         return vote.toJson()
                 return jsonify(
                     {
                         "result": False,
-                        "error": "Not Found",
+                        "message": "Not Found",
                         "api": "/search",
                         "url": request.url,
                     }
@@ -32,27 +31,27 @@ def search():
 
             elif "blockNo" in jsonData:
                 for vote in blockchain.chain:
-                    print(vote.index)
                     if vote.index == jsonData["blockNo"]:
+                        print(vote.index)
                         return vote.toJson()
                 return jsonify(
                     {
                         "result": False,
-                        "error": "Not Found",
+                        "message": "Not Found",
                         "api": "/search",
                         "url": request.url,
                     }
                 )
 
-            elif "fromVoter" in jsonData:
+            elif "voterIdHash" in jsonData:
                 for vote in blockchain.chain:
-                    print(vote.fromVoter)
-                    if vote.fromVoter == jsonData["fromVoter"]:
+                    if vote.voterIdHash == jsonData["voterIdHash"]:
+                        print(vote.voterIdHash)
                         return vote.toJson()
                 return jsonify(
                     {
                         "result": False,
-                        "error": "Not Found",
+                        "message": "Not Found",
                         "api": "/search",
                         "url": request.url,
                     }
@@ -62,7 +61,7 @@ def search():
                 return jsonify(
                     {
                         "result": False,
-                        "error": "Incomplete Data",
+                        "message": "Incomplete Data",
                         "api": "/search",
                         "url": request.url,
                     }
@@ -72,7 +71,7 @@ def search():
             return jsonify(
                 {
                     "result": False,
-                    "error": "Invalid JSON Format",
+                    "message": "Invalid JSON Format",
                     "api": "/search",
                     "url": request.url,
                 }
@@ -82,7 +81,7 @@ def search():
         return jsonify(
             {
                 "result": False,
-                "error": "Some error occured",
+                "message": "Some error occured",
                 "api": "/search",
                 "url": request.url,
             }

@@ -2,18 +2,18 @@ from database import adminRequired
 from database.voterModel import Voter
 from ivote import iVoteApp, voterDb
 from flask import request, jsonify
-from werkzeug.security import generate_password_hash
+
+# from werkzeug.security import generate_password_hash
 from sqlalchemy.exc import IntegrityError
 
 
 @iVoteApp.route("/addVoter", methods=["POST"])
-@adminRequired(api="/addVoter")
+# @adminRequired(api="/addVoter")
 def addVoter():
     """
     Node-to-Node API\n
     Authority-to-Node API
     """
-
     print("/addVoter Called")
     print("DATA RECIEVED:", request.data)
 
@@ -28,15 +28,12 @@ def addVoter():
                 and "district" in jsonData
                 and "ward" in jsonData
                 and "mobile" in jsonData
-                and "password" in jsonData
+                and "passwordHash" in jsonData
+                and "isVoteCasted" in jsonData
             ):
-                voter = Voter(
-                    voterId=jsonData["voterId"],
-                    name=jsonData["name"],
-                    mobile=jsonData["mobile"],
-                    passwordHash=generate_password_hash(jsonData["password"]),
-                )
+                voter = Voter.fromJson(jsonData)
                 print("adding data")
+
                 # insert user
                 added = voterDb.addVoter(voter)
                 if added:
@@ -46,7 +43,7 @@ def addVoter():
                             {
                                 "result": True,
                                 "api": "/addVoter",
-                                "result": "Successfully Added voter",
+                                "message": "Successfully Added voter",
                                 "url": request.url,
                             }
                         ),
@@ -58,7 +55,7 @@ def addVoter():
                         {
                             "result": False,
                             "api": "/addVoter",
-                            "error": "Voter Failed to add in Database",
+                            "message": "Voter Failed to add in Database",
                             "url": request.url,
                         }
                     )
@@ -67,7 +64,7 @@ def addVoter():
             return jsonify(
                 {
                     "result": False,
-                    "error": "Invalid JSON Format",
+                    "message": "Invalid JSON Format",
                     "api": "/addVoter",
                     "url": request.url,
                 }
@@ -78,7 +75,7 @@ def addVoter():
         return jsonify(
             {
                 "result": False,
-                "error": "Voter Db Rollback\nUser already exists",
+                "message": "Voter Db Rollback\nUser already exists",
                 "api": "/addVoter",
                 "url": request.url,
             }
@@ -88,7 +85,7 @@ def addVoter():
         return jsonify(
             {
                 "result": False,
-                "error": "Provide data in json format",
+                "message": "Provide data in json format",
                 "api": "/addVoter",
                 "url": request.url,
             }
@@ -98,7 +95,7 @@ def addVoter():
         return jsonify(
             {
                 "result": False,
-                "error": "Some error occured",
+                "message": "Some error occured",
                 "api": "/addVoter",
                 "url": request.url,
             }

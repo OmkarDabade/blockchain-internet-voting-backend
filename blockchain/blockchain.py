@@ -1,7 +1,14 @@
+from hashlib import sha1
+from database.adminModel import Admin
+from database.voterModel import Voter
+from block.candidate import Candidate
+from . import candidateList, candidates
 from block.vote import Vote
 from constants import *
 import requests
 from datetime import datetime
+from flask import request
+from database import voterDb, adminDb
 
 
 class Blockchain:
@@ -11,10 +18,10 @@ class Blockchain:
 
     def __init__(self):
         self.previousIndex: int = 0
-        self.previousHash: str = genesisBlockHash
+        self.previousHash: str = GENESIS_BLOCKHASH
         self.chain: list[Vote] = []
 
-    def addBlock(self, candidateId: int, candidateName: str, fromVoter: str):
+    def addBlock(self, candidateId: int, candidateName: str, voterId: str):
         """
         A function that adds the block to the chain after verification.
         """
@@ -25,9 +32,10 @@ class Blockchain:
                 0,
                 candidateId,
                 candidateName,
-                fromVoter,
+                # voterId,
+                sha1(voterId.encode()).hexdigest(),
                 datetime.now(),
-                genesisBlockHash,
+                GENESIS_BLOCKHASH,
             )
 
             self.chain.append(newBlock)
@@ -37,7 +45,8 @@ class Blockchain:
                 self.previousIndex + 1,
                 candidateId,
                 candidateName,
-                fromVoter,
+                # voterId,
+                sha1(voterId.encode()).hexdigest(),
                 datetime.now(),
                 self.previousHash,
             )
@@ -45,7 +54,11 @@ class Blockchain:
             self.chain.append(newBlock)
             self.previousIndex += 1
             self.previousHash = newBlock.blockHash
-            self.announceNewBlock(newBlock)
+
+        self.announceNewBlock(newBlock)
+
+        if self.previousIndex % CONSENSOUS_AFTER_N_BLOCKS == 0:
+            self.consensus()
 
     def acceptNewAnnouncedBlock(self, block: Vote):
         """
@@ -53,29 +66,29 @@ class Blockchain:
         """
         print("Accept New Anounced Block")
 
-        if len(self.chain) == 0:
-            print("Previous     HASH:", self.previousHash)
-            print("Recived BlockHASH:", block.previousBlockHash)
+        # if len(self.chain) == 0:
+        print("Previous     HASH:", self.previousHash)
+        print("Recived BlockHASH:", block.previousBlockHash)
 
-            if self.previousHash != block.previousBlockHash:
-                print("Hash doesnt match")
-                return False
+        if self.previousHash != block.previousBlockHash:
+            print("Hash doesnt match")
+            return False
 
-            if not self.isValidProof(block, block.blockHash):
-                print("is not valid proof")
-                return False
-        else:
+        if not self.isValidProof(block, block.blockHash):
+            print("is not valid proof")
+            return False
 
-            print("Previous     HASH:", self.previousHash)
-            print("Recived BlockHASH:", block.previousBlockHash)
+        # else:
+        #     print("Previous     HASH:", self.previousHash)
+        #     print("Recived BlockHASH:", block.previousBlockHash)
 
-            if self.previousHash != block.previousBlockHash:
-                print("Hash doesnt match")
-                return False
+        #     if self.previousHash != block.previousBlockHash:
+        #         print("Hash doesnt match")
+        #         return False
 
-            if not self.isValidProof(block, block.blockHash):
-                print("is not valid proof")
-                return False
+        #     if not self.isValidProof(block, block.blockHash):
+        #         print("is not valid proof")
+        #         return False
 
         print("Block added to chain")
         self.chain.append(block)
@@ -90,27 +103,17 @@ class Blockchain:
         the difficulty criteria.
         """
         return (
-            blockHash.startswith("0" * blockchainDifficulty)
+            blockHash.startswith("0" * BLOCKCHAIN_DIFFICULTY)
             and blockHash == block.computeHash()
         )
 
     @classmethod
     def checkChainValidity(cls, chainDump: dict):
         result = True
-        previousHash = genesisBlockHash
+        previousHash = GENESIS_BLOCKHASH
 
-        for block_data in chainDump:
-
-            block = Vote(
-                index=block_data["block#"],
-                candidateId=block_data["candidateId"],
-                candidateName=block_data["candidateName"],
-                fromVoter=block_data["fromVoter"],
-                timestamp=datetime.fromisoformat(block_data["time"]),
-                previousHash=block_data["previousHash"],
-                blockHash=block_data["blockHash"],
-                nonce=block_data["nonce"],
-            )
+        for blockData in chainDump:
+            block = Vote.fromJson(blockData)
 
             if (
                 not cls.isValidProof(block, block.blockHash)
@@ -118,10 +121,36 @@ class Blockchain:
             ):
                 result = False
                 break
-
             previousHash = block.blockHash
 
         return result
+
+    def syncChain(self, chainDump: dict):
+        # previousHash = GENESIS_BLOCKHASH
+        # for blockData in chainDump:
+        #     block = Vote.fromJson(blockData)
+
+        #     if (
+        #         not self.isValidProof(block, block.blockHash)
+        #         or previousHash != block.previousBlockHash
+        #     ):
+        #         return False
+
+        #     previousHash = block.blockHash
+
+        res = self.checkChainValidity(chainDump)
+        if res:
+            newChain: list[Vote] = []
+
+            for voteData in chainDump:
+                vote = Vote.fromJson(voteData)
+                newChain.append(vote)
+            self.chain = newChain
+            print("successfully synced the chain")
+        else:
+            print("Chain is tampered unable to sync")
+
+        return res
 
     def announceNewBlock(self, block: Vote):
         """
@@ -136,171 +165,244 @@ class Blockchain:
             return
 
         for peer in peers:
-            url = "{}/addBlock".format(peer)
-            headers = {"Content-Type": "application/json"}
+            url = "{}addBlock".format(peer)
+            # headers = {"Content-Type": "application/json"}
             print(url)
-            try:
-                res = requests.post(url=url, json=block.toJson(), headers=headers)
-                print("Peer: ", peer)
-                print("API Response ", res.text)
-                if res.status_code == 200:
-                    jsonData = res.json()
-                    print("Result: ", jsonData["result"])
+            # try:
+            res = requests.post(url=url, json=block.toJson(), headers=POST_HEADERS)
+            print("Peer: ", peer)
+            print("API Response ", res.text)
+            if res.status_code == 200:
+                jsonData = res.json()
+                print("Result: ", jsonData["result"])
 
-                    if jsonData["result"] == True:
-                        print("res is True")
-                        if jsonData["data"]["Length"] != len(self.chain):
-                            self.consensus()
-            except:
-                print("Some error occured during annoucing block")
+                # if jsonData["result"] == True:
+                #     print("res is True")
+                #     if jsonData["data"]["Length"] != len(self.chain):
+                #         self.consensus()
+            # except:
+            #     print("Some error occured during annoucing block")
+
+    def getChainInJson(self):
+        chain = []
+        for vote in self.chain:
+            # vote.voterId = sha1(vote.voterId.encode()).hexdigest()
+            chain.append(vote.toJson())
+
+        return chain
 
     def consensus(self):
         """
         Our naive consensus algorithm. If a longer valid chain is
         found, our chain is replaced with it.
         """
+        print("Consensous called")
 
-        print("consensous called")
-        longestChain = None
-        current_len = len(self.chain)
+        if len(peers) == 0:
+            print("No registerd peers, returning...")
+            return
 
+        print("URL:", request.url)
+        print("CURRENT NODE ADDRESS: ", request.host_url)
+
+        # Peers
+        # -----------------------------------------------------------------------------
+
+        print("Getting All Peers")
+        longestPeerList = None
+        currentPeerLength = len(peers)
+
+        # Check for longest peer list
         for node in peers:
-            print(node)
-            response = requests.get("{}/chain".format(node))
-            length = response.json()["Length"]
-            chain = response.json()["Chain"]
-            if length > current_len and self.checkChainValidity(chain):
-                current_len = length
-                longestChain = chain
+            response = requests.get("{}syncPeers".format(node))
+            jsonData = response.json()
+            if jsonData["length"] != currentPeerLength:
+                longestPeerList = jsonData["peers"]
+                currentPeerLength = jsonData["length"]
 
-        if longestChain:
-            self.chain = longestChain
-            print("NewChain:", longestChain)
-            return True
+        # If long peer list avialable sync it with current node
+        if longestPeerList:
+            for peer in longestPeerList:
+                if request.host_url != peer:
+                    peers.add(str(peer))
 
-        return False
+            # longestPeerList = None
+            currentPeerLength = len(peers)
+            print("Syncing Peers with other nodes")
 
+            # Sync longest peer list among all nodes
+            for node in peers:
+                response = requests.get("{}syncPeers".format(node))
+                jsonData = response.json()
+                if jsonData["length"] != currentPeerLength:
+                    resp = requests.post(
+                        url="{}syncPeers".format(node),
+                        json={"peers": list(peers)},
+                        headers=POST_HEADERS,
+                    )
+                    if resp.status_code != 200:
+                        print("Unable to Sync Peers with Node:", node)
 
-# endpoint to add a block mined by someone else to
-# the node's chain. The block is first verified by the node
-# and then added to the chain.
-# @app.route("/add_block", methods=["POST"])
-# def verify_and_add_block():
-#     block_data = request.get_json()
-#     block = Block(
-#         block_data["index"],
-#         block_data["transactions"],
-#         block_data["timestamp"],
-#         block_data["previous_hash"],
-#         block_data["nonce"],
-#     )
+        # Chain
+        # -----------------------------------------------------------------------------
 
-#     proof = block_data["hash"]
-#     added = blockchain.add_block(block, proof)
+        print("Getting Chain")
+        longestValidChainDump = None
+        currentChainLength = len(self.chain)
 
-#     if not added:
-#         return "The block was discarded by the node", 400
+        # Check for longest chain
+        for node in peers:
+            response = requests.get("{}syncChain".format(node))
+            jsonData = response.json()
+            if jsonData["length"] != currentChainLength and self.checkChainValidity(
+                jsonData["chain"]
+            ):
+                longestValidChainDump = jsonData["chain"]
+                currentChainLength = jsonData["length"]
 
-#     return "Block added to the chain", 201
+        # If longest valid chain avialable sync it with current node
+        if longestValidChainDump:
+            self.syncChain(longestValidChainDump)
 
+            # longestPeerList = None
+            currentChainLength = len(self.chain)
+            print("Syncing Chain")
 
-# endpoint to submit a new transaction. This will be used by
-# our application to add new data (posts) to the blockchain
-# @app.route("/new_transaction", methods=["POST"])
-# def new_transaction():
-#     tx_data = request.get_json()
-#     required_fields = ["author", "content"]
+            # Sync longest valid chain among all nodes
+            for node in peers:
+                response = requests.get("{}syncChain".format(node))
+                jsonData = response.json()
+                if jsonData[
+                    "length"
+                ] != currentChainLength or not self.checkChainValidity(
+                    jsonData["chain"]
+                ):
+                    resp = requests.post(
+                        url="{}syncChain".format(node),
+                        json={"chain": self.getChainInJson()},
+                        headers=POST_HEADERS,
+                    )
+                    if resp.status_code != 200:
+                        print("Unable to Sync Chain with Node:", node)
 
-#     for field in required_fields:
-#         if not tx_data.get(field):
-#             return "Invalid transaction data", 404
+        # Candidates
+        # -----------------------------------------------------------------------------
 
-#     tx_data["timestamp"] = time.time()
+        print("Syncing Candidates")
+        longestCandidateData = None
+        currentCandidateDataLength = len(candidateList)
 
-#     blockchain.add_new_transaction(tx_data)
+        # Check for longest candidate list
+        for node in peers:
+            response = requests.get("{}syncCandidates".format(node))
+            jsonData = response.json()
+            if jsonData["length"] != currentCandidateDataLength:
+                longestCandidateData = jsonData["candidates"]
+                currentCandidateDataLength = jsonData["length"]
 
-#     return "Success", 201
+        # If longest candidate list avialable sync it with current node
+        if longestCandidateData:
+            for candidateData in longestCandidateData:
+                candidate = Candidate.fromJson(candidateData)
+                if candidate.candidateId not in candidateList:
+                    candidateList.append(candidate)
 
+            currentCandidateDataLength = len(candidateList)
+            print("Syncing Candidates")
 
-# endpoint to request the node to mine the unconfirmed
-# transactions (if any). We'll be using it to initiate
-# a command to mine from our application itself.
-# @app.route("/mine", methods=["GET"])
-# def mine_unconfirmed_transactions():
-#     result = blockchain.mine()
-#     if not result:
-#         return "No transactions to mine"
-#     else:
-#         # Making sure we have the longest chain before announcing to the network
-#         chain_length = len(blockchain.chain)
-#         consensus()
-#         if chain_length == len(blockchain.chain):
-#             # announce the recently mined block to the network
-#             announce_new_block(blockchain.last_block)
-#         return "Block #{} is mined.".format(blockchain.last_block.index)
+            # Sync longest candidate list among all nodes
+            for node in peers:
+                response = requests.get("{}syncCandidates".format(node))
+                jsonData = response.json()
+                if jsonData["length"] != currentCandidateDataLength:
+                    resp = requests.post(
+                        url="{}syncCandidates".format(node),
+                        json={"candidates": candidates.getAllCandidatesInJson()},
+                        headers=POST_HEADERS,
+                    )
+                    if resp.status_code != 200:
+                        print("Unable to Sync Canidates with Node:", node)
 
+        # Voter Database
+        # -----------------------------------------------------------------------------
 
-# class Blockchain:
-# difficulty of our PoW algorithm
-# difficulty = 2
+        print("Syncing Voter Database")
+        largestVoterDatabase = None
+        currentVoterDatabaseLength = voterDb.totalVoters()
 
-# def __init__(self):
-#     self.unconfirmed_transactions = []
-#     self.chain = []
+        # Check if largest voterDb is avialable
+        for node in peers:
+            response = requests.get("{}syncVoterDatabase".format(node))
+            jsonData = response.json()
+            if jsonData["length"] != currentVoterDatabaseLength:
+                largestVoterDatabase = jsonData["voters"]
+                currentVoterDatabaseLength = jsonData["length"]
 
-# def create_genesis_block(self):
-#     """
-#     A function to generate genesis block and appends it to
-#     the chain. The block has index 0, previous_hash as 0, and
-#     a valid hash.
-#     """
-#     genesis_block = Block(0, [], 0, "0")
-#     genesis_block.hash = genesis_block.compute_hash()
-#     self.chain.append(genesis_block)
+        # If large voterDb is avialable sync it with current node
+        if largestVoterDatabase:
+            for voterData in largestVoterDatabase:
+                newVoter = Voter.fromJson(voterData)
+                voter = voterDb.getVoter(newVoter.voterId)
 
-# @property
-# def last_block(self):
-#     return self.chain[-1]
+                # add if voter is None
+                if voter == None:
+                    voterDb.addVoter(newVoter)
 
-# @staticmethod
-# def proof_of_work(block):
-#     """
-#     Function that tries different values of nonce to get a hash
-#     that satisfies our difficulty criteria.
-#     """
-#     block.nonce = 0
+            currentVoterDatabaseLength = voterDb.totalVoters()
+            print("Syncing VoterDb")
 
-#     computed_hash = block.compute_hash()
-#     while not computed_hash.startswith("0" * Blockchain.difficulty):
-#         block.nonce += 1
-#         computed_hash = block.compute_hash()
+            # Sync largest voterDb among all nodes
+            for node in peers:
+                response = requests.get("{}syncVoterDatabase".format(node))
+                jsonData = response.json()
+                if jsonData["length"] != currentVoterDatabaseLength:
+                    resp = requests.post(
+                        url="{}syncVoterDatabase".format(node),
+                        json={"voters": voterDb.getAllVotersInJson()},
+                        headers=POST_HEADERS,
+                    )
+                    if resp.status_code != 200:
+                        print("Unable to Sync VoterDb with Node:", node)
 
-#     return computed_hash
+        # Admin Database
+        # -----------------------------------------------------------------------------
 
-# def add_new_transaction(self, transaction):
-#     self.unconfirmed_transactions.append(transaction)
+        print("Syncing Admin Database")
+        largestAdminDatabase = None
+        currentAdminDatabaseLength = adminDb.totalAdmins()
 
-# def mine(self):
-#     """
-#     This function serves as an interface to add the pending
-#     transactions to the blockchain by adding them to the block
-#     and figuring out Proof Of Work.
-#     """
-#     if not self.unconfirmed_transactions:
-#         return False
+        # Check if any long adminDb is avialable
+        for node in peers:
+            response = requests.get("{}syncAdminDatabase".format(node))
+            jsonData = response.json()
+            if jsonData["length"] != currentAdminDatabaseLength:
+                largestAdminDatabase = jsonData["admins"]
+                currentAdminDatabaseLength = jsonData["length"]
 
-#     last_block = self.last_block
+        # If long adminDb avialable sync it for current node
+        if largestAdminDatabase:
+            for adminData in largestAdminDatabase:
+                newAdmin = Admin.fromJson(adminData)
+                admin = adminDb.getAdmin(newAdmin.loginId)
 
-#     new_block = Block(
-#         index=last_block.index + 1,
-#         transactions=self.unconfirmed_transactions,
-#         timestamp=time.time(),
-#         previous_hash=last_block.hash,
-#     )
+                # add if admin is None
+                if admin == None:
+                    adminDb.addAdmin(newAdmin)
 
-#     proof = self.proof_of_work(new_block)
-#     self.add_block(new_block, proof)
+            currentAdminDatabaseLength = adminDb.totalAdmins()
+            print("Syncing AdminDb")
 
-#     self.unconfirmed_transactions = []
+            # Sync largest AdminDb among all nodes
+            for node in peers:
+                response = requests.get("{}syncAdminDatabase".format(node))
+                jsonData = response.json()
+                if jsonData["length"] != currentAdminDatabaseLength:
+                    resp = requests.post(
+                        url="{}syncAdminDatabase".format(node),
+                        json={"admins": adminDb.getAllAdminsInJson()},
+                        headers=POST_HEADERS,
+                    )
+                    if resp.status_code != 200:
+                        print("Unable to Sync AdminDb with Node:", node)
 
-#     return True
+        return True

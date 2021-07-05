@@ -1,6 +1,7 @@
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.exc import IntegrityError
-from werkzeug.security import generate_password_hash
+
+# from werkzeug.security import generate_password_hash
 
 # from database import Voter
 
@@ -35,6 +36,20 @@ class AdminDatabase:
         from database import Admin
 
         return self.database.session.query(Admin).all()
+
+    def getAllAdminsInJson(self):
+        from database import Admin
+
+        adminsInJson = []
+        for admin in self.database.session.query(Admin).all():
+            adminsInJson.append(admin.toJson())
+
+        return adminsInJson
+
+    def totalAdmins(self):
+        from database import Admin
+
+        return self.database.session.query(Admin).count()
 
     def getAdmin(self, loginId: str):
         from database import Admin

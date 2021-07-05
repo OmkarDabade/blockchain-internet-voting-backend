@@ -1,4 +1,4 @@
-from constants import ROLEVOTER
+from constants import *
 from database import voterDb
 from sqlalchemy import Column, String, Boolean, Integer
 
@@ -7,7 +7,7 @@ from sqlalchemy import Column, String, Boolean, Integer
 class Voter(voterDb.database.Model):
 
     __tablename__ = "voters"
-    __bind_key__ = ROLEVOTER
+    __bind_key__ = ROLE_VOTER
 
     id = Column("Id", Integer, autoincrement=True, primary_key=True)
     voterId = Column("Voter Id", String(15), unique=True)
@@ -52,3 +52,16 @@ class Voter(voterDb.database.Model):
             "mobile": self.mobile,
             "passwordHash": self.passwordHash,
         }
+
+    @staticmethod
+    def fromJson(jsonData: dict):
+        return Voter(
+            voterId=jsonData["voterId"],
+            name=jsonData["name"],
+            state=jsonData["state"],
+            district=jsonData["district"],
+            ward=jsonData["ward"],
+            isVoteCasted=jsonData["isVoteCasted"],
+            mobile=jsonData["mobile"],
+            passwordHash=jsonData["passwordHash"],
+        )

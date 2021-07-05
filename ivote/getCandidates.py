@@ -5,12 +5,11 @@ from blockchain import candidateList
 
 
 @iVoteApp.route("/getCandidates", methods=["GET"])
-@jwt_required()
+# @jwt_required()
 def getCandidates():
     """
     Client-to-Node API
     """
-
     print("/getCandidates Called")
     print("DATA RECIEVED:", request.data)
 
@@ -21,8 +20,8 @@ def getCandidates():
 
             if len(jsonData) == 0:
                 for candidate in candidateList:
-                    print("Entered Loop")
                     chain.append(candidate.toJson())
+                print("Sending all candidates")
                 return (
                     jsonify(
                         {
@@ -34,9 +33,8 @@ def getCandidates():
                     ),
                     200,
                 )
-
-            if "state" in jsonData and "district" in jsonData and "ward" in jsonData:
-                print("Entered in 3")
+            elif "state" in jsonData and "district" in jsonData and "ward" in jsonData:
+                print("Sending all candidates state, district and ward wise")
                 for candidate in candidateList:
                     print("Entered Loop")
                     if (
@@ -44,9 +42,9 @@ def getCandidates():
                         and candidate.district == jsonData["district"]
                         and candidate.ward == jsonData["ward"]
                     ):
-                        print("Match found")
                         chain.append(candidate.toJson())
 
+                print("Match found")
                 return (
                     jsonify(
                         {
@@ -60,6 +58,7 @@ def getCandidates():
                 )
 
             elif "state" in jsonData and "district" in jsonData:
+                print("Sending all candidates state and district wise")
                 for candidate in candidateList:
                     if (
                         candidate.state == jsonData["state"]
@@ -67,6 +66,7 @@ def getCandidates():
                     ):
                         chain.append(candidate.toJson())
 
+                print("Match found")
                 return (
                     jsonify(
                         {
@@ -83,7 +83,7 @@ def getCandidates():
                 return jsonify(
                     {
                         "result": False,
-                        "error": "Incomplete Data",
+                        "message": "Incomplete Data",
                         "api": "/getCandidates",
                         "url": request.url,
                     }
@@ -93,7 +93,7 @@ def getCandidates():
             return jsonify(
                 {
                     "result": False,
-                    "error": "Invalid JSON Format",
+                    "message": "Invalid JSON Format",
                     "api": "/getCandidates",
                     "url": request.url,
                 }
@@ -103,7 +103,7 @@ def getCandidates():
         return jsonify(
             {
                 "result": False,
-                "error": "Some error occured",
+                "message": "Some error occured",
                 "api": "/getCandidates",
                 "url": request.url,
             }

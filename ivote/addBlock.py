@@ -1,7 +1,5 @@
-from datetime import datetime
 from block.vote import Vote
 from ivote import iVoteApp
-from ivote.chain import get_chain
 from flask import request, jsonify
 from blockchain import blockchain
 
@@ -11,7 +9,6 @@ def addBlock():
     """
     Node-to-Node API
     """
-
     print("/addBlock Called")
     print("DATA RECIEVED:", request.data)
 
@@ -29,16 +26,17 @@ def addBlock():
                 and "blockHash" in jsonData
                 and "previousHash" in jsonData
             ):
-                newBlock = Vote(
-                    jsonData["block#"],
-                    jsonData["candidateId"],
-                    jsonData["candidateName"],
-                    jsonData["fromVoter"],
-                    datetime.fromisoformat(jsonData["time"]),
-                    jsonData["previousHash"],
-                    blockHash=jsonData["blockHash"],
-                    nonce=jsonData["nonce"],
-                )
+                newBlock = Vote.fromJson(jsonData)
+                # (
+                #     jsonData["block#"],
+                #     jsonData["candidateId"],
+                #     jsonData["candidateName"],
+                #     jsonData["fromVoter"],
+                #     datetime.fromisoformat(jsonData["time"]),
+                #     jsonData["previousHash"],
+                #     blockHash=jsonData["blockHash"],
+                #     nonce=jsonData["nonce"],
+                # )
 
                 res = blockchain.acceptNewAnnouncedBlock(newBlock)
 
@@ -47,7 +45,7 @@ def addBlock():
                         jsonify(
                             {
                                 "result": True,
-                                "data": get_chain(),
+                                "data": blockchain.getChainInJson(),
                                 "api": "/addBlock",
                                 "url": request.url,
                             }
@@ -58,7 +56,7 @@ def addBlock():
                     return jsonify(
                         {
                             "result": False,
-                            "error": "Block Not Added to chain",
+                            "message": "Block Not Added to chain",
                             "api": "/addBlock",
                             "url": request.url,
                         }
@@ -67,7 +65,7 @@ def addBlock():
                 return jsonify(
                     {
                         "result": False,
-                        "error": "Incomplete Data",
+                        "message": "Incomplete Data",
                         "api": "/addBlock",
                         "url": request.url,
                     }
@@ -77,7 +75,7 @@ def addBlock():
             return jsonify(
                 {
                     "result": False,
-                    "error": "Invalid JSON Format",
+                    "message": "Invalid JSON Format",
                     "api": "/addBlock",
                     "url": request.url,
                 }
@@ -87,7 +85,7 @@ def addBlock():
         return jsonify(
             {
                 "result": False,
-                "error": "Some error occured",
+                "message": "Some error occured",
                 "api": "/add_block",
                 "url": request.url,
             }

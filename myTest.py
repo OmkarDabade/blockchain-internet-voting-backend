@@ -57,9 +57,3 @@ signUp = {
     "mobile": 132456789,
     "password": "TestPass",
 }
-
-
-now = datetime.now()
-print(now)
-
-print(now.isoformat(), datetime.fromisoformat(now.isoformat()))

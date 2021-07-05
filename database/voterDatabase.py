@@ -25,10 +25,44 @@ class VoterDatabase:
 
         return self.database.session.query(Voter).all()
 
+    def getAllVotersInJson(self):
+        from database import Voter
+
+        votersInJson = []
+        for voter in self.database.session.query(Voter).all():
+            votersInJson.append(voter.toJson())
+
+        return votersInJson
+
+    def totalVoters(self):
+        from database import Voter
+
+        return self.database.session.query(Voter).count()
+
     def getVoter(self, voterId: str):
         from database import Voter
 
         return self.database.session.query(Voter).filter_by(voterId=voterId).first()
+
+    def castVote(self, voterId: str):
+        # from database import Voter
+
+        try:
+            voter = self.getVoter(voterId=voterId)
+
+            if voter == None:
+                return False
+
+            voter.isVoteCasted = True
+            self.database.session.commit()
+            return True
+        except IntegrityError:
+            print("Voter Db Rollback\nUser already exists")
+            self.database.session.rollback()
+            return False
+        except:
+            print("Error: Updating Cast Vote in Db")
+            return False
 
     def addVoter(self, voter):
         try:
@@ -40,4 +74,5 @@ class VoterDatabase:
             self.database.session.rollback()
             return False
         except:
+            print("Error: Adding Voter in Db")
             return False
