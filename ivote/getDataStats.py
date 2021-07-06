@@ -8,7 +8,7 @@ from database import voterDb, adminDb
 @iVoteApp.route("/getDataStats", methods=["GET"])
 def getDataStats():
     """
-    Node-to-Node API
+    Authority-to-Node API
     """
     print("/getDataStats Called")
     print("DATA RECIEVED:", request.data)
