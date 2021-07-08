@@ -5,8 +5,14 @@ from database import voterDb, adminDb
 from flask import Flask
 from flask_jwt_extended import JWTManager
 from constants import ROLE_ADMIN, ROLE_VOTER
+from flask_cors import CORS
 
 iVoteApp = Flask(__name__)
+
+# To use this flask api app on other platforms other than curl
+# Cross Origin Resource Sharing (CORS)
+CORS(iVoteApp)
+
 # Setup the Flask-JWT-Extended extension
 iVoteApp.config["JWT_SECRET_KEY"] = "This-Is-My-Super-Duper-Secret-Key-875"
 
