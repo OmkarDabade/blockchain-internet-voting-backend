@@ -7,7 +7,7 @@ from database import voterDb
 
 # API to cast vote
 @iVoteApp.route("/castVote", methods=["POST"])
-# @jwt_required()
+@jwt_required()
 def castVote():
     """
     Client-to-Node API
@@ -24,28 +24,28 @@ def castVote():
                 and "candidateName" in jsonData
                 and "voterId" in jsonData
             ):
-                # voter = voterDb.getVoter(jsonData["voterId"])
+                voter = voterDb.getVoter(jsonData["voterId"])
 
-                # if voter == None:
-                #     return jsonify(
-                #         {
-                #             "result": False,
-                #             "message": "Voter not found",
-                #             "api": "/castVote",
-                #             "url": request.url,
-                #         }
-                #     )
+                if voter == None:
+                    return jsonify(
+                        {
+                            "result": False,
+                            "message": "Voter not found",
+                            "api": "/castVote",
+                            "url": request.url,
+                        }
+                    )
 
-                # if voter.isVoteCasted:
-                #     return jsonify(
-                #         {
-                #             "result": True,
-                #             "message": "Vote Already Casted",
-                #             "voterId": sha1(jsonData["voterId"].encode()).hexdigest(),
-                #             "api": "/castVote",
-                #             "url": request.url,
-                #         }
-                #     )
+                if voter.isVoteCasted:
+                    return jsonify(
+                        {
+                            "result": True,
+                            "message": "Vote Already Casted",
+                            "voterId": sha1(jsonData["voterId"].encode()).hexdigest(),
+                            "api": "/castVote",
+                            "url": request.url,
+                        }
+                    )
 
                 blockchain.addBlock(
                     jsonData["candidateId"],  # CandidateId
@@ -54,9 +54,7 @@ def castVote():
                 )
 
                 voteCasted = voterDb.castVote(jsonData["voterId"])
-
                 vote = blockchain.chain[-1]
-                # vote.voterId = sha1(vote.voterId.encode()).hexdigest()
 
                 return jsonify(
                     {

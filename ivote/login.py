@@ -19,7 +19,7 @@ def login():
             jsonData = request.get_json()
 
             if "voterId" in jsonData and "password" in jsonData:
-                print("Voter Data is Here")
+                print("Voter Data recieved")
                 voter = voterDb.getVoter(jsonData["voterId"])
 
                 if voter == None:
@@ -51,6 +51,7 @@ def login():
                             "message": "Successful Login",
                             "isVoteCasted": voter.isVoteCasted,
                             "token": accessToken,
+                            "voter": voter.toJson(),
                             "url": request.url,
                         }
                     )
@@ -64,7 +65,7 @@ def login():
                         }
                     )
             elif "loginId" in jsonData and "password" in jsonData:
-                print("Admin Data is Here")
+                print("Admin Data recieved")
                 admin = adminDb.getAdmin(jsonData["loginId"])
 
                 if admin == None:
@@ -96,6 +97,8 @@ def login():
                             "result": True,
                             "api": "/login",
                             "message": "Successful Login",
+                            "name": admin.name,
+                            "loginId": admin.loginId,
                             "token": accessToken,
                             "url": request.url,
                         }

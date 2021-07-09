@@ -7,7 +7,7 @@ from sqlalchemy.exc import IntegrityError
 
 # API to add new voter to database
 @iVoteApp.route("/addVoter", methods=["POST"])
-# @adminRequired(api="/addVoter")
+@adminRequired(api="/addVoter")
 def addVoter():
     """
     Node-to-Node API\n

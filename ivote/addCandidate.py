@@ -6,7 +6,7 @@ from blockchain import candidateList, candidates
 
 # API to add new candidate to current node
 @iVoteApp.route("/addCandidate", methods=["POST"])
-# @adminRequired(api="/addCandidate")
+@adminRequired(api="/addCandidate")
 def addCandidate():
     """
     Node-to-Node API\n
