@@ -19,11 +19,23 @@ def search():
                 for vote in blockchain.chain:
                     if vote.blockHash == jsonData["blockHash"]:
                         print(vote.blockHash)
-                        return vote.toJson()
+                        return (
+                            jsonify(
+                                {
+                                    "result": True,
+                                    "vote": vote.toJson(),
+                                    "message": "Requested Block Hash Found",
+                                    "api": "/search",
+                                    "url": request.url,
+                                }
+                            ),
+                            200,
+                        )
+
                 return jsonify(
                     {
                         "result": False,
-                        "message": "Not Found",
+                        "message": "Requested Block Hash Not Found",
                         "api": "/search",
                         "url": request.url,
                     }
@@ -33,11 +45,22 @@ def search():
                 for vote in blockchain.chain:
                     if vote.index == jsonData["blockNo"]:
                         print(vote.index)
-                        return vote.toJson()
+                        return (
+                            jsonify(
+                                {
+                                    "result": True,
+                                    "vote": vote.toJson(),
+                                    "message": "Requested Block Number Found",
+                                    "api": "/search",
+                                    "url": request.url,
+                                }
+                            ),
+                            200,
+                        )
                 return jsonify(
                     {
                         "result": False,
-                        "message": "Not Found",
+                        "message": "Requested Block Number Not Found",
                         "api": "/search",
                         "url": request.url,
                     }
@@ -47,11 +70,22 @@ def search():
                 for vote in blockchain.chain:
                     if vote.voterIdHash == jsonData["voterIdHash"]:
                         print(vote.voterIdHash)
-                        return vote.toJson()
+                        return (
+                            jsonify(
+                                {
+                                    "result": True,
+                                    "vote": vote.toJson(),
+                                    "message": "Requested Voter ID Hash Found",
+                                    "api": "/search",
+                                    "url": request.url,
+                                }
+                            ),
+                            200,
+                        )
                 return jsonify(
                     {
                         "result": False,
-                        "message": "Not Found",
+                        "message": "Requested Voter's Hash Not Found",
                         "api": "/search",
                         "url": request.url,
                     }

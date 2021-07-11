@@ -1,5 +1,6 @@
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.exc import IntegrityError
+from werkzeug.security import generate_password_hash
 
 # from werkzeug.security import generate_password_hash
 # from database import Voter
@@ -9,6 +10,7 @@ class AdminDatabase:
     """
     Class to manage admin database
     """
+
     def __init__(self) -> None:
         self.database = SQLAlchemy()
         # self.database.init_app(app)
@@ -60,14 +62,36 @@ class AdminDatabase:
         print(admin)
         return admin
 
+    def changePassword(self, loginId: str, newPassowrd: str, name: str):
+        # from database import Voter
+        try:
+            admin = self.getAdmin(loginId=loginId)
+
+            if admin == None:
+                return False, "Admin not found"
+
+            if admin.name != name:
+                return False, "Verification Failed\nPlease check your details"
+
+            admin.passwordHash = generate_password_hash(newPassowrd)
+            self.database.session.commit()
+            return True, "Password changed successfully"
+        # except IntegrityError:
+        #     print("Voter Db Rollback\nUser already exists")
+        #     self.database.session.rollback()
+        #     return False
+        except:
+            print("Error: Updating Password in AdminDb")
+            return False, "Some error occured, Try again!"
+
     def addAdmin(self, admin):
         try:
             self.database.session.add(admin)
             self.database.session.commit()
-            return True
+            return True, "Successfully registered"
         except IntegrityError:
             print("Admin Db Rollback\nUser already exists")
             self.database.session.rollback()
-            return False
+            return False, "Admin already exists! Please login"
         except:
-            return False
+            return False, "Some error occured, Try again!"

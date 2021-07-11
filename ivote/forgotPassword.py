@@ -6,13 +6,13 @@ from ivote import iVoteApp, voterDb
 from flask import request, jsonify
 from werkzeug.security import generate_password_hash
 
-# API to register in system(for voter as well as admin)
-@iVoteApp.route("/signup", methods=["POST"])
-def signup():
+# API to change password in system(for voter as well as admin)
+@iVoteApp.route("/forgotPassword", methods=["POST"])
+def forgotPassword():
     """
-    Client-to-Authority API
+    Client-to-Node API
     """
-    print("/signup Called")
+    print("/forgotPassword Called")
     print("DATA RECIEVED:", request.data)
 
     try:
@@ -21,33 +21,25 @@ def signup():
 
             if (
                 "voterId" in jsonData
-                and "name" in jsonData
-                and "state" in jsonData
                 and "district" in jsonData
-                and "ward" in jsonData
-                and "mobile" in jsonData
-                and "password" in jsonData
+                and "name" in jsonData
+                and "newPassword" in jsonData
             ):
-                voter = Voter(
-                    voterId=jsonData["voterId"],
+                changed, msg = voterDb.changePassword(
+                    voterId=jsonData["loginId"],
                     name=jsonData["name"],
-                    state=jsonData["state"],
                     district=jsonData["district"],
-                    ward=jsonData["ward"],
-                    mobile=jsonData["mobile"],
-                    passwordHash=generate_password_hash(jsonData["password"]),
+                    newPassowrd=jsonData["newPassword"],
                 )
-                print("adding voter")
-                # insert user
-                added, msg = voterDb.addVoter(voter)
-                if added:
-                    print("adding done")
+
+                if changed:
+                    print("password changed")
                     blockchain.consensus()
                     return (
                         jsonify(
                             {
                                 "result": True,
-                                "api": "/signup",
+                                "api": "/forgotPassword",
                                 "message": msg,
                                 "url": request.url,
                             }
@@ -55,35 +47,34 @@ def signup():
                         200,
                     )
                 else:
-                    print("Could not Add Voter")
+                    print("Could not Change Voter's Password")
                     return jsonify(
                         {
                             "result": False,
-                            "api": "/signup",
+                            "api": "/forgotPassword",
                             "message": msg,
                             "url": request.url,
                         }
                     )
 
             elif (
-                "loginId" in jsonData and "name" in jsonData and "password" in jsonData
+                "loginId" in jsonData
+                and "name" in jsonData
+                and "newPassword" in jsonData
             ):
-                admin = Admin(
-                    loginId=jsonData["loginId"],
+                changed, msg = adminDb.changePassword(
                     name=jsonData["name"],
-                    passwordHash=generate_password_hash(jsonData["password"]),
+                    loginId=jsonData["loginId"],
+                    newPassowrd=jsonData["newPassword"],
                 )
-                print("adding admin")
-                # insert admin
-                added, msg = adminDb.addAdmin(admin)
-                if added:
-                    print("adding done")
+
+                if changed:
                     blockchain.consensus()
                     return (
                         jsonify(
                             {
                                 "result": True,
-                                "api": "/signup",
+                                "api": "/forgotPassword",
                                 "message": msg,
                                 "url": request.url,
                             }
@@ -91,11 +82,11 @@ def signup():
                         200,
                     )
                 else:
-                    print("Could not Add Admin")
+                    print("Could not Change Admin Password")
                     return jsonify(
                         {
                             "result": False,
-                            "api": "/signup",
+                            "api": "/forgotPassword",
                             "message": msg,
                             "url": request.url,
                         }
@@ -106,7 +97,7 @@ def signup():
                     {
                         "result": False,
                         "message": "Incomplete Data",
-                        "api": "/signup",
+                        "api": "/forgotPassword",
                         "url": request.url,
                     }
                 )
@@ -116,7 +107,7 @@ def signup():
                 {
                     "result": False,
                     "message": "Invalid JSON Format",
-                    "api": "/signup",
+                    "api": "/forgotPassword",
                     "url": request.url,
                 }
             )
@@ -125,7 +116,7 @@ def signup():
             {
                 "result": False,
                 "message": "Some error occured",
-                "api": "/signup",
+                "api": "/forgotPassword",
                 "url": request.url,
             }
         )

@@ -14,6 +14,7 @@ def chain():
 
     return jsonify(
         {
+            "result": True,
             "length": len(blockchain.chain),
             "chain": blockchain.getChainInJson(),
             "peers": len(peers),

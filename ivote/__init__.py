@@ -37,6 +37,7 @@ from .castVote import castVote
 from .chain import chain
 from .consensus import consensus
 
+from .forgotPassword import forgotPassword
 from .getCandidates import getCandidates
 from .getDataStats import getDataStats
 
