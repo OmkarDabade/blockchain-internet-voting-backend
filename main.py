@@ -15,4 +15,4 @@ if __name__ == "__main__":
     for vote in blockchain.chain:
         print(vote)
 
-    iVoteApp.run(debug=True, host="0.0.0.0")
+    iVoteApp.run(host="0.0.0.0")
