@@ -71,7 +71,10 @@ class AdminDatabase:
                 return False, "Admin not found"
 
             if admin.name != name:
-                return False, "Verification Failed\nPlease check your details"
+                return (
+                    False,
+                    "Verification Failed(Name doesnt match)\nPlease check your details",
+                )
 
             admin.passwordHash = generate_password_hash(newPassowrd)
             self.database.session.commit()

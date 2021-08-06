@@ -75,7 +75,7 @@ def addBlock():
             {
                 "result": False,
                 "message": "Some error occured",
-                "api": "/add_block",
+                "api": "/addBlock",
                 "url": request.url,
             }
         )

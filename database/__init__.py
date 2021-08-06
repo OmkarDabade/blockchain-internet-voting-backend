@@ -31,7 +31,7 @@ def adminRequired(api: str = ""):
                         {
                             "result": False,
                             "api": api,
-                            "error": "Admins only!",
+                            "error": "Access denied!\nAdmins only.",
                             "url": request.url,
                         }
                     ),

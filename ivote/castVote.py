@@ -40,7 +40,7 @@ def castVote():
                     return jsonify(
                         {
                             "result": True,
-                            "message": "Vote Already Casted",
+                            "message": "Access denied!\nVote Already Casted",
                             "voterId": sha1(jsonData["voterId"].encode()).hexdigest(),
                             "api": "/castVote",
                             "url": request.url,
@@ -53,7 +53,7 @@ def castVote():
                     jsonData["voterId"],  # VoterId
                 )
 
-                voteCasted = voterDb.castVote(jsonData["voterId"])
+                voteCasted, msg = voterDb.castVote(jsonData["voterId"])
                 vote = blockchain.chain[-1]
 
                 return jsonify(

@@ -78,7 +78,10 @@ class VoterDatabase:
                 return False, "Voter not found"
 
             if voter.name != name or voter.district != district:
-                return False, "Verification Failed\nPlease check your details"
+                return (
+                    False,
+                    "Verification Failed(Name & district doesnt match)\nPlease check your details",
+                )
 
             voter.passwordHash = generate_password_hash(newPassowrd)
             self.database.session.commit()
