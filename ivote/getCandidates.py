@@ -16,17 +16,17 @@ def getCandidates():
     try:
         if request.is_json:
             jsonData = request.get_json()
-            chain = []
+            candidatesListToSend = []
 
             if len(jsonData) == 0:
                 for candidate in candidateList:
-                    chain.append(candidate.toJson())
+                    candidatesListToSend.append(candidate.toJson())
                 print("Sending all candidates")
                 return (
                     jsonify(
                         {
                             "result": True,
-                            "candidates": chain,
+                            "candidates": candidatesListToSend,
                             "api": "/getCandidates",
                             "url": request.url,
                         }
@@ -42,14 +42,13 @@ def getCandidates():
                         and candidate.district == jsonData["district"]
                         and candidate.ward == jsonData["ward"]
                     ):
-                        chain.append(candidate.toJson())
-
-                print("Match found")
+                        candidatesListToSend.append(candidate.toJson())
+                        print("Match found")
                 return (
                     jsonify(
                         {
                             "result": True,
-                            "candidates": chain,
+                            "candidates": candidatesListToSend,
                             "api": "/getCandidates",
                             "url": request.url,
                         }
@@ -64,14 +63,13 @@ def getCandidates():
                         candidate.state == jsonData["state"]
                         and candidate.district == jsonData["district"]
                     ):
-                        chain.append(candidate.toJson())
-
-                print("Match found")
+                        candidatesListToSend.append(candidate.toJson())
+                        print("Match found")
                 return (
                     jsonify(
                         {
                             "result": True,
-                            "candidates": chain,
+                            "candidates": candidatesListToSend,
                             "api": "/getCandidates",
                             "url": request.url,
                         }
