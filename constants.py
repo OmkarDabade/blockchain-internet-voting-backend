@@ -12,3 +12,5 @@ POST_HEADERS: dict = {"Content-Type": "application/json"}
 peers: set = set()
 
 CONSENSOUS_AFTER_N_BLOCKS = 2
+
+VERSION: float = 0.1
