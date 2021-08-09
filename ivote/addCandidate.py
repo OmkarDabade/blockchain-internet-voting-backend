@@ -2,7 +2,7 @@ from blockchain import blockchain
 from database import adminRequired
 from ivote import iVoteApp
 from flask import request, jsonify
-from blockchain import candidates
+from database import candidateDb
 
 # API to add new candidate to current node
 @iVoteApp.route("/addCandidate", methods=["POST"])
@@ -26,7 +26,7 @@ def addCandidate():
                 and "district" in jsonData
                 and "ward" in jsonData
             ):
-                candidates.addCandidate(
+                added, msg = candidateDb.addCandidate(
                     jsonData["candidateId"],
                     jsonData["candidateName"],
                     jsonData["state"],
@@ -34,12 +34,18 @@ def addCandidate():
                     jsonData["ward"],
                 )
 
-                blockchain.consensus()
+                if added:
+                    print("Candidate Added")
+                    blockchain.consensus()
+                else:
+                    print("Error Adding Candidate")
+                    print(msg)
 
                 return jsonify(
                     {
-                        "result": True,
-                        "data": candidates.candidatesList[-1].toJson(),
+                        "result": added,
+                        # "data": candidateDb.candidatesList[-1].toJson(),
+                        "message": msg,
                         "api": "/addCandidate",
                         "url": request.url,
                     }

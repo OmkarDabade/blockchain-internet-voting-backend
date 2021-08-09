@@ -1,7 +1,7 @@
-from block.candidate import Candidate
+from database.candidateModel import Candidate
 from ivote import iVoteApp
 from flask import request, jsonify
-from blockchain import candidates
+from database import candidateDb
 
 # API to sync list of candidates
 @iVoteApp.route("/syncCandidates", methods=["GET", "POST"])
@@ -16,8 +16,8 @@ def syncCandidates():
             return jsonify(
                 {
                     "result": True,
-                    "length": len(candidates.candidatesList),
-                    "candidates": candidates.getAllCandidatesInJson(),
+                    "length": candidateDb.totalCandidates(),
+                    "candidates": candidateDb.getAllCandidatesInJson(),
                     "api": "/syncCandidates",
                     "url": request.url,
                 }
@@ -27,21 +27,28 @@ def syncCandidates():
             if request.is_json:
                 jsonData = request.get_json()
                 receivedCandidates = jsonData["candidates"]
+                added, msg = None
 
-                if len(candidates.candidatesList) != len(receivedCandidates):
+                if candidateDb.totalCandidates() != len(receivedCandidates):
                     for candidateData in receivedCandidates:
                         candidate = Candidate.fromJson(candidateData)
-                        if candidate.candidateId not in candidates.candidatesList:
-                            candidates.candidatesList.append(candidate)
+                        if candidate.candidateId not in candidateDb.allCandidates():
+                            added, msg = candidateDb.addCandidate(
+                                candidate.candidateId,
+                                candidate.candidateName,
+                                candidate.state,
+                                candidate.district,
+                                candidate.ward,
+                            )
 
                     print("adding candidates done")
                     return (
                         jsonify(
                             {
-                                "result": True,
+                                "result": added,
                                 "api": "/syncCandidates",
-                                "message": "Successfully Added All Candidates",
-                                "length": len(candidates.candidatesList),
+                                "message": msg,
+                                "length": candidateDb.totalCandidates(),
                                 "url": request.url,
                             }
                         ),
@@ -54,7 +61,7 @@ def syncCandidates():
                                 "result": True,
                                 "api": "/syncCandidates",
                                 "message": "Candidates Already in Sync",
-                                "length": len(candidates.candidatesList),
+                                "length": candidateDb.totalCandidates(),
                                 "url": request.url,
                             }
                         ),

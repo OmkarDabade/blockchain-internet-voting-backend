@@ -1,14 +1,13 @@
 from hashlib import sha1
 from database.adminModel import Admin
 from database.voterModel import Voter
-from block.candidate import Candidate
-from . import candidates
+from database.candidateModel import Candidate
 from block.vote import Vote
 from constants import *
 import requests
 from datetime import datetime
 from flask import request
-from database import voterDb, adminDb
+from database import voterDb, adminDb, candidateDb
 
 
 class Blockchain:
@@ -175,6 +174,7 @@ class Blockchain:
             return
 
         print("CURRENT NODE ADDRESS: ", request.host_url)
+        return True
 
         # Peers
         # -----------------------------------------------------------------------------

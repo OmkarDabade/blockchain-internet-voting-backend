@@ -34,31 +34,26 @@ def addVoter():
                 print("adding data")
 
                 # insert user
-                added = voterDb.addVoter(voter)
+                added, msg = voterDb.addVoter(voter)
+
                 if added:
                     print("adding done")
                     blockchain.consensus()
-                    return (
-                        jsonify(
-                            {
-                                "result": True,
-                                "api": "/addVoter",
-                                "message": "Successfully Added voter",
-                                "url": request.url,
-                            }
-                        ),
-                        200,
-                    )
+
                 else:
                     print("Could not Add Voter")
-                    return jsonify(
+
+                return (
+                    jsonify(
                         {
-                            "result": False,
+                            "result": added,
                             "api": "/addVoter",
-                            "message": "Voter Failed to add in Database",
+                            "message": msg,
                             "url": request.url,
                         }
-                    )
+                    ),
+                    200,
+                )
 
         else:
             return jsonify(

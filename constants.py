@@ -4,6 +4,7 @@ GENESIS_BLOCKHASH: str = "GenesisBlockHash"
 
 ROLE_ADMIN: str = "admin"
 ROLE_VOTER: str = "voter"
+CANDIDATES: str = "candidates"
 
 POST_HEADERS: dict = {"Content-Type": "application/json"}
 

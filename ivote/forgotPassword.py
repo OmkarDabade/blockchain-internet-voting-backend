@@ -1,10 +1,11 @@
 from blockchain import blockchain
 from database import adminDb
-from database.adminModel import Admin
-from database.voterModel import Voter
+
+# from database.adminModel import Admin
+# from database.voterModel import Voter
 from ivote import iVoteApp, voterDb
 from flask import request, jsonify
-from werkzeug.security import generate_password_hash
+
 
 # API to change password in system(for voter as well as admin)
 @iVoteApp.route("/forgotPassword", methods=["POST"])

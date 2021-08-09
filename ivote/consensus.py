@@ -1,7 +1,7 @@
 from ivote import iVoteApp
 from flask import request, jsonify
-from blockchain import blockchain, candidates
-from database import voterDb, adminDb
+from blockchain import blockchain
+from database import voterDb, adminDb, candidateDb
 from constants import peers
 
 # API to perform consensus
@@ -23,7 +23,7 @@ def consensus():
                 "message": "Consensus Performed",
                 "api": "/consensus",
                 "chain": len(blockchain.chain),
-                "candidates": len(candidates.candidatesList),
+                "candidates": candidateDb.totalCandidates(),
                 "peers": len(peers),
                 "voters": voterDb.totalVoters(),
                 "admins": adminDb.totalAdmins(),

@@ -1,6 +1,6 @@
-from .candidates import Candidates
+# from .candidates import Candidates
 
-candidates = Candidates()
+# candidates = Candidates()
 
 from .blockchain import Blockchain
 

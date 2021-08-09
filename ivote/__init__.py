@@ -1,10 +1,10 @@
 from database.voterModel import Voter
 from database.adminModel import Admin
 from flask.json import jsonify
-from database import voterDb, adminDb
+from database import voterDb, adminDb, candidateDb
 from flask import Flask
 from flask_jwt_extended import JWTManager
-from constants import ROLE_ADMIN, ROLE_VOTER
+from constants import CANDIDATES, ROLE_ADMIN, ROLE_VOTER
 from flask_cors import CORS
 
 iVoteApp = Flask(__name__)
@@ -21,11 +21,13 @@ iVoteApp.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///adminDatabase.db"
 iVoteApp.config["SQLALCHEMY_BINDS"] = {
     ROLE_ADMIN: "sqlite:///adminDatabase.db",
     ROLE_VOTER: "sqlite:///voterDatabase.db",
+    CANDIDATES: "sqlite:///candidateDatabase.db",
 }
 iVoteApp.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
 voterDb.database.init_app(iVoteApp)
 adminDb.database.init_app(iVoteApp)
+candidateDb.database.init_app(iVoteApp)
 
 jwt = JWTManager(iVoteApp)
 
