@@ -1,7 +1,7 @@
 from ivote import iVoteApp
 from flask import request, jsonify
 from constants import peers
-from blockchain import blockchain, candidateList
+from blockchain import blockchain, candidates
 from database import voterDb, adminDb
 
 # API to get stats of all data
@@ -19,7 +19,7 @@ def getDataStats():
             "api": "/getDataStats",
             "url": request.url,
             "chain": len(blockchain.chain),
-            "candidates": len(candidateList),
+            "candidates": len(candidates.candidatesList),
             "peers": len(peers),
             "voters": voterDb.totalVoters(),
             "admins": adminDb.totalAdmins(),

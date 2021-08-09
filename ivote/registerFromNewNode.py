@@ -2,8 +2,7 @@ from ivote import iVoteApp
 from flask import request, jsonify
 import requests
 from constants import peers, POST_HEADERS
-from blockchain import blockchain, candidates
-from database import adminDb, voterDb
+from blockchain import blockchain
 
 # API to register new node of network and perform a sync operation
 @iVoteApp.route("/registerFromNewNode", methods=["POST"])

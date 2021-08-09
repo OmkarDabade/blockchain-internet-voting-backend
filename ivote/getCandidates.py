@@ -1,7 +1,7 @@
 from flask_jwt_extended.view_decorators import jwt_required
 from ivote import iVoteApp
 from flask import request, jsonify
-from blockchain import candidateList
+from blockchain import candidates
 
 # API to get list of candidates to whom vote will be casted
 @iVoteApp.route("/getCandidates", methods=["POST"])
@@ -19,7 +19,7 @@ def getCandidates():
             candidatesListToSend = []
 
             if len(jsonData) == 0:
-                for candidate in candidateList:
+                for candidate in candidates.candidatesList:
                     candidatesListToSend.append(candidate.toJson())
                 print("Sending all candidates")
                 return (
@@ -35,7 +35,7 @@ def getCandidates():
                 )
             elif "state" in jsonData and "district" in jsonData and "ward" in jsonData:
                 print("Sending all candidates state, district and ward wise")
-                for candidate in candidateList:
+                for candidate in candidates.candidatesList:
                     print("Entered Loop")
                     if (
                         candidate.state == jsonData["state"]
@@ -58,7 +58,7 @@ def getCandidates():
 
             elif "state" in jsonData and "district" in jsonData:
                 print("Sending all candidates state and district wise")
-                for candidate in candidateList:
+                for candidate in candidates.candidatesList:
                     if (
                         candidate.state == jsonData["state"]
                         and candidate.district == jsonData["district"]

@@ -1,7 +1,7 @@
 from block.candidate import Candidate
 from ivote import iVoteApp
 from flask import request, jsonify
-from blockchain import candidates, candidateList
+from blockchain import candidates
 
 # API to sync list of candidates
 @iVoteApp.route("/syncCandidates", methods=["GET", "POST"])
@@ -16,7 +16,7 @@ def syncCandidates():
             return jsonify(
                 {
                     "result": True,
-                    "length": len(candidateList),
+                    "length": len(candidates.candidatesList),
                     "candidates": candidates.getAllCandidatesInJson(),
                     "api": "/syncCandidates",
                     "url": request.url,
@@ -28,11 +28,11 @@ def syncCandidates():
                 jsonData = request.get_json()
                 receivedCandidates = jsonData["candidates"]
 
-                if len(candidateList) != len(receivedCandidates):
+                if len(candidates.candidatesList) != len(receivedCandidates):
                     for candidateData in receivedCandidates:
                         candidate = Candidate.fromJson(candidateData)
-                        if candidate.candidateId not in candidateList:
-                            candidateList.append(candidate)
+                        if candidate.candidateId not in candidates.candidatesList:
+                            candidates.candidatesList.append(candidate)
 
                     print("adding candidates done")
                     return (
@@ -41,7 +41,7 @@ def syncCandidates():
                                 "result": True,
                                 "api": "/syncCandidates",
                                 "message": "Successfully Added All Candidates",
-                                "length": len(candidateList),
+                                "length": len(candidates.candidatesList),
                                 "url": request.url,
                             }
                         ),
@@ -54,7 +54,7 @@ def syncCandidates():
                                 "result": True,
                                 "api": "/syncCandidates",
                                 "message": "Candidates Already in Sync",
-                                "length": len(candidateList),
+                                "length": len(candidates.candidatesList),
                                 "url": request.url,
                             }
                         ),

@@ -2,7 +2,7 @@ from hashlib import sha1
 from database.adminModel import Admin
 from database.voterModel import Voter
 from block.candidate import Candidate
-from . import candidateList, candidates
+from . import candidates
 from block.vote import Vote
 from constants import *
 import requests
