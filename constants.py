@@ -14,4 +14,4 @@ peers: set = set()
 
 CONSENSOUS_AFTER_N_BLOCKS = 5
 
-VERSION: float = 0.2
+VERSION: float = 0.3

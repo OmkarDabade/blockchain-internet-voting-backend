@@ -24,10 +24,7 @@ class CandidateDatabase:
 
         self.database.create_all(app=app)
         # self.database.session.add(
-        #     Admin(
-        #         name="Admin",
-        #         loginId="admin",
-        #         passwordHash=generate_password_hash("admin"),
+        #     Candidate(
         #     )
         # )
         # self.database.session.commit()
