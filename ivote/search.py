@@ -1,38 +1,122 @@
 from ivote import iVoteApp
 from flask import request, jsonify
-from blockchain import voteBlockchain
+from blockchain import blockchain
 
-
-@iVoteApp.route("/search", methods=["GET"])
+# API to search for proof of vote casted
+@iVoteApp.route("/search", methods=["POST"])
 def search():
+    """
+    Client-to-Node API
+    """
+    print("/search Called")
+    print("DATA RECIEVED:", request.data)
+
     try:
         if request.is_json:
             jsonData = request.get_json()
-            print(jsonData)
 
             if "blockHash" in jsonData:
-                for item in voteBlockchain.chain:
-                    print(item.blockHash)
-                    if item.blockHash == jsonData["blockHash"]:
-                        return item.toJson()
+                for vote in blockchain.chain:
+                    if vote.blockHash == jsonData["blockHash"]:
+                        print(vote.blockHash)
+                        return (
+                            jsonify(
+                                {
+                                    "result": True,
+                                    "vote": vote.toJson(),
+                                    "message": "Requested Block Hash Found",
+                                    "api": "/search",
+                                    "url": request.url,
+                                }
+                            ),
+                            200,
+                        )
+
+                return jsonify(
+                    {
+                        "result": False,
+                        "message": "Requested Block Hash Not Found",
+                        "api": "/search",
+                        "url": request.url,
+                    }
+                )
 
             elif "blockNo" in jsonData:
-                for item in voteBlockchain.chain:
-                    print(item.index)
-                    if item.index == jsonData["blockNo"]:
-                        return item.toJson()
+                for vote in blockchain.chain:
+                    if vote.index == jsonData["blockNo"]:
+                        print(vote.index)
+                        return (
+                            jsonify(
+                                {
+                                    "result": True,
+                                    "vote": vote.toJson(),
+                                    "message": "Requested Block Number Found",
+                                    "api": "/search",
+                                    "url": request.url,
+                                }
+                            ),
+                            200,
+                        )
+                return jsonify(
+                    {
+                        "result": False,
+                        "message": "Requested Block Number Not Found",
+                        "api": "/search",
+                        "url": request.url,
+                    }
+                )
 
-            elif "voteFrom" in jsonData:
-                for item in voteBlockchain.chain:
-                    print(item.voteFrom)
-                    if item.voteFrom == jsonData["voteFrom"]:
-                        return item.toJson()
+            elif "voterIdHash" in jsonData:
+                for vote in blockchain.chain:
+                    if vote.voterIdHash == jsonData["voterIdHash"]:
+                        print(vote.voterIdHash)
+                        return (
+                            jsonify(
+                                {
+                                    "result": True,
+                                    "vote": vote.toJson(),
+                                    "message": "Requested Voter ID Hash Found",
+                                    "api": "/search",
+                                    "url": request.url,
+                                }
+                            ),
+                            200,
+                        )
+                return jsonify(
+                    {
+                        "result": False,
+                        "message": "Requested Voter's Hash Not Found",
+                        "api": "/search",
+                        "url": request.url,
+                    }
+                )
 
             else:
-                return jsonify({"result": False, "error": "Incomplete Data"})
+                return jsonify(
+                    {
+                        "result": False,
+                        "message": "Incomplete Data",
+                        "api": "/search",
+                        "url": request.url,
+                    }
+                )
 
         else:
-            return jsonify({"result": False, "error": "Invalid JSON Format"})
+            return jsonify(
+                {
+                    "result": False,
+                    "message": "Invalid JSON Format",
+                    "api": "/search",
+                    "url": request.url,
+                }
+            )
 
     except:
-        return jsonify({"result": False, "error": "Some error occured"})
+        return jsonify(
+            {
+                "result": False,
+                "message": "Some error occured",
+                "api": "/search",
+                "url": request.url,
+            }
+        )

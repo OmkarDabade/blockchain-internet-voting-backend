@@ -1,9 +1,17 @@
-from werkzeug.security import generate_password_hash
+BLOCKCHAIN_DIFFICULTY: int = 3
 
-difficultyVoteBlockchain = 4
-difficultyCandidateBlockchain = difficultyVoteBlockchain
+GENESIS_BLOCKHASH: str = "GenesisBlockHash"
 
-users = {
-    "john": generate_password_hash("Test_Pass"),
-    "susan": generate_password_hash("HI_THERE"),
-}
+ROLE_ADMIN: str = "admin"
+ROLE_VOTER: str = "voter"
+CANDIDATES: str = "candidates"
+
+POST_HEADERS: dict = {"Content-Type": "application/json"}
+
+# the address to other participating members of the network
+#: Format "http://127.0.0.1:5000/"
+peers: set = set()
+
+CONSENSOUS_AFTER_N_BLOCKS = 5
+
+VERSION: float = 0.3
