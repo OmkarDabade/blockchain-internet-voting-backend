@@ -8,7 +8,6 @@ Frontend: Source code for Frontend is available [Here](https://github.com/OmkarD
 
 ## Demo of the website
 
-For a basic demo without a server and without any login credentials. [Visit Here](https://omkardabade.github.io/Blockchain-Internet-Voting-Frontend)
 
 For full fledged, hosted website with a server backend please follow as mentioned below. (It may or may not work)
 
